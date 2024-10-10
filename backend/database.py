@@ -141,12 +141,13 @@ def populate_db():
     con.commit()
 
 
-# cursor.execute("SELECT * FROM User")
 try:
     cur.execute("SELECT * FROM User")
+    con.close()
 except:
     init_db()
     populate_db()
+    con.close()
 
 
 def get_all_users():
@@ -215,7 +216,7 @@ def get_all_posts():
     connection = sqlite3.connect('database.db')
     cursor = connection.cursor()
     cursor.execute("SELECT * FROM Post")
-    posts = [dict(post_id=row[0], title=row[1], content=row[2]) for row in cursor.fetchall()]
+    posts = [dict(post_id=row[0], caption=row[1], picture_url=row[2], is_selling=row[3], price=row[4], selling_link=row[5], date=row[6]) for row in cursor.fetchall()]
     connection.close()
     return posts
 
@@ -227,15 +228,36 @@ def get_post_by_id(post_id):
     row = cursor.fetchone()
     connection.close()
     if row:
-        return dict(post_id=row[0], title=row[1], content=row[2])
+        return dict(post_id=row[0], caption=row[1], picture_url=row[2], is_selling=row[3], price=row[4], selling_link=row[5], date=row[6])
     return None
+
+
+def delete_post_by_id(user_id):
+    connection = sqlite3.connect('database.db')
+    cursor = connection.cursor()
+    cursor.execute("DELETE FROM Post WHERE post_id = ?", (user_id,))
+    connection.commit()
+    deleted = cursor.rowcount > 0
+    connection.close()
+    return deleted
+
+
+def update_post_by_id(post_id, caption, picture_url, is_selling, price, selling_link, date):
+    connection = sqlite3.connect('database.db')
+    cursor = connection.cursor()
+    cursor.execute("UPDATE Post SET caption = ?, picture_url = ?, is_selling = ?, price = ?, selling_link = ?, date = ? WHERE post_id = ?",
+                   (caption, picture_url, is_selling, price, selling_link, date, post_id))
+    connection.commit()
+    updated = cursor.rowcount > 0
+    connection.close()
+    return updated
 
 
 def get_all_shoes():
     connection = sqlite3.connect('database.db')
     cursor = connection.cursor()
     cursor.execute("SELECT * FROM Shoe")
-    shoes = [dict(shoe_id=row[0], brand=row[1], model=row[2]) for row in cursor.fetchall()]
+    shoes = [dict(shoe_id=row[0], brand=row[1], model=row[2], year=row[3], color=row[4]) for row in cursor.fetchall()]
     connection.close()
     return shoes
 
@@ -247,5 +269,37 @@ def get_shoe_by_id(shoe_id):
     row = cursor.fetchone()
     connection.close()
     if row:
-        return dict(shoe_id=row[0], brand=row[1], model=row[2])
+        return dict(shoe_id=row[0], brand=row[1], model=row[2], year=row[3], color=row[4])
     return None
+
+
+def delete_shoe_by_id(shoe_id):
+    connection = sqlite3.connect('database.db')
+    cursor = connection.cursor()
+    cursor.execute("DELETE FROM Shoe WHERE shoe_id = ?", (shoe_id,))
+    connection.commit()
+    deleted = cursor.rowcount > 0
+    connection.close()
+    return deleted
+
+
+def update_shoe_by_id(shoe_id, brand, model, year, color):
+    connection = sqlite3.connect('database.db')
+    cursor = connection.cursor()
+    cursor.execute("UPDATE Shoe SET brand = ?, model = ?, year = ?, color = ? WHERE shoe_id = ?",
+                   (brand, model, year, color, shoe_id))
+    connection.commit()
+    updated = cursor.rowcount > 0
+    connection.close()
+    return updated
+
+
+def add_shoe_to_database(brand, model, year, color, admin_id):
+    connection = sqlite3.connect('database.db')
+    cursor = connection.cursor()
+    cursor.execute("INSERT INTO Shoe (brand, model, year, color, creator_id) VALUES (?, ?, ?, ?, ?)",
+                   (brand, model, year, color, admin_id))
+    connection.commit()
+    updated = cursor.rowcount > 0
+    connection.close()
+    return updated
