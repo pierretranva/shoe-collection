@@ -9,7 +9,12 @@ cur = con.cursor()
 
 
 def init_db():
-    # create all the tables if they don't exists
+    # create all the tables if they don't exist
+
+    sql_create_admin = """CREATE TABLE IF NOT EXISTS Admin (
+    admin_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT,
+    password TEXT)"""
 
     sql_create_user = """CREATE TABLE IF NOT EXISTS User (
     user_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -19,7 +24,6 @@ def init_db():
     hometown TEXT,
     admin_moderator_id INTEGER,
     FOREIGN KEY (admin_moderator_id) REFERENCES Admin(admin_id))"""
-    # sql_create_user = " ".join(line.strip() for line in sql_create_user.splitlines())
 
     sql_create_post = """CREATE TABLE IF NOT EXISTS Post (
     post_id INTEGER PRIMARY KEY AUTOINCREMENT, 
@@ -28,30 +32,13 @@ def init_db():
     is_selling INTEGER,
     price REAL,
     selling_link TEXT,
-    date TEXT,
+    date TEXT, -- Use TEXT to store dates in ISO 8601 format ('YYYY-MM-DD')
     creator_id INTEGER,
     related_shoe_id INTEGER,
     admin_moderator_id INTEGER,
     FOREIGN KEY (creator_id) REFERENCES User(user_id),
     FOREIGN KEY (related_shoe_id) REFERENCES Shoe(shoe_id),
     FOREIGN KEY (admin_moderator_id) REFERENCES Admin(admin_id))"""
-    # sql_create_post = " ".join(line.strip() for line in sql_create_post.splitlines())
-
-    sql_create_shoe = """CREATE TABLE IF NOT EXISTS Shoe (
-    shoe_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    brand TEXT,
-    model TEXT,
-    year INTEGER,
-    color TEXT,
-    creator_id INTEGER,
-    FOREIGN KEY (creator_id) REFERENCES User(user_id))"""
-    # sql_create_shoe = " ".join(line.strip() for line in sql_create_shoe.splitlines())
-
-    sql_create_admin = """CREATE TABLE IF NOT EXISTS Admin (
-    admin_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT,
-    password TEXT)"""
-    # sql_create_admin = " ".join(line.strip() for line in sql_create_admin.splitlines())
 
     sql_create_shoe = """CREATE TABLE IF NOT EXISTS Shoe (
     shoe_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -61,23 +48,20 @@ def init_db():
     color TEXT,
     creator_id INTEGER,
     FOREIGN KEY (creator_id) REFERENCES Admin(admin_id))"""
-    # sql_create_shoe = " ".join(line.strip() for line in sql_create_shoe.splitlines())
 
     sql_create_followers = """CREATE TABLE IF NOT EXISTS Followers (
     followers_id INTEGER PRIMARY KEY AUTOINCREMENT,
     follower INTEGER,
     followee INTEGER,
-    FOREIGN KEY (follower) REFERENCES User(user_id),
-    FOREIGN KEY (followee) REFERENCES User(user_id))"""
-    # sql_create_followers = " ".join(line.strip() for line in sql_create_followers.splitlines())
+    FOREIGN KEY (follower) REFERENCES User(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (followee) REFERENCES User(user_id) ON DELETE CASCADE)"""
 
     sql_create_likes = """CREATE TABLE IF NOT EXISTS Likes (
     likes_id INTEGER PRIMARY KEY AUTOINCREMENT,
     post_id INTEGER,
     user_id INTEGER,
-    FOREIGN KEY (post_id) REFERENCES Post(post_id),
-    FOREIGN KEY (user_id) REFERENCES User(user_id))"""
-    # sql_create_likes = " ".join(line.strip() for line in sql_create_likes.splitlines())
+    FOREIGN KEY (post_id) REFERENCES Post(post_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES User(user_id) ON DELETE CASCADE)"""
 
     sql_create_comment = """CREATE TABLE IF NOT EXISTS Comment (
     comment_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -85,21 +69,17 @@ def init_db():
     date TEXT,
     creator_id INTEGER,
     post_id INTEGER,
-    FOREIGN KEY (creator_id) REFERENCES User(user_id),
-    FOREIGN KEY (post_id) REFERENCES Post(post_id))"""
-    # sql_create_comment = " ".join(line.strip() for line in sql_create_comment.splitlines())
+    FOREIGN KEY (creator_id) REFERENCES User(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (post_id) REFERENCES Post(post_id) ON DELETE CASCADE)"""
 
+    cur.execute(sql_create_admin)
     cur.execute(sql_create_user)
     cur.execute(sql_create_post)
     cur.execute(sql_create_shoe)
-    cur.execute(sql_create_admin)
     cur.execute(sql_create_followers)
     cur.execute(sql_create_likes)
     cur.execute(sql_create_comment)
     con.commit()
-
-    # cur.execute("SELECT name FROM sqlite_master WHERE type='table';")
-    # print(cur.fetchall())
 
 
 def hash_password(password):
@@ -141,12 +121,13 @@ def populate_db():
     con.commit()
 
 
-# cursor.execute("SELECT * FROM User")
 try:
     cur.execute("SELECT * FROM User")
+    con.close()
 except:
     init_db()
     populate_db()
+    con.close()
 
 
 def get_all_users():
@@ -215,7 +196,7 @@ def get_all_posts():
     connection = sqlite3.connect('database.db')
     cursor = connection.cursor()
     cursor.execute("SELECT * FROM Post")
-    posts = [dict(post_id=row[0], title=row[1], content=row[2]) for row in cursor.fetchall()]
+    posts = [dict(post_id=row[0], caption=row[1], picture_url=row[2], is_selling=row[3], price=row[4], selling_link=row[5], date=row[6]) for row in cursor.fetchall()]
     connection.close()
     return posts
 
@@ -227,15 +208,36 @@ def get_post_by_id(post_id):
     row = cursor.fetchone()
     connection.close()
     if row:
-        return dict(post_id=row[0], title=row[1], content=row[2])
+        return dict(post_id=row[0], caption=row[1], picture_url=row[2], is_selling=row[3], price=row[4], selling_link=row[5], date=row[6])
     return None
+
+
+def delete_post_by_id(user_id):
+    connection = sqlite3.connect('database.db')
+    cursor = connection.cursor()
+    cursor.execute("DELETE FROM Post WHERE post_id = ?", (user_id,))
+    connection.commit()
+    deleted = cursor.rowcount > 0
+    connection.close()
+    return deleted
+
+
+def update_post_by_id(post_id, caption, picture_url, is_selling, price, selling_link, date):
+    connection = sqlite3.connect('database.db')
+    cursor = connection.cursor()
+    cursor.execute("UPDATE Post SET caption = ?, picture_url = ?, is_selling = ?, price = ?, selling_link = ?, date = ? WHERE post_id = ?",
+                   (caption, picture_url, is_selling, price, selling_link, date, post_id))
+    connection.commit()
+    updated = cursor.rowcount > 0
+    connection.close()
+    return updated
 
 
 def get_all_shoes():
     connection = sqlite3.connect('database.db')
     cursor = connection.cursor()
     cursor.execute("SELECT * FROM Shoe")
-    shoes = [dict(shoe_id=row[0], brand=row[1], model=row[2]) for row in cursor.fetchall()]
+    shoes = [dict(shoe_id=row[0], brand=row[1], model=row[2], year=row[3], color=row[4]) for row in cursor.fetchall()]
     connection.close()
     return shoes
 
@@ -247,5 +249,37 @@ def get_shoe_by_id(shoe_id):
     row = cursor.fetchone()
     connection.close()
     if row:
-        return dict(shoe_id=row[0], brand=row[1], model=row[2])
+        return dict(shoe_id=row[0], brand=row[1], model=row[2], year=row[3], color=row[4])
     return None
+
+
+def delete_shoe_by_id(shoe_id):
+    connection = sqlite3.connect('database.db')
+    cursor = connection.cursor()
+    cursor.execute("DELETE FROM Shoe WHERE shoe_id = ?", (shoe_id,))
+    connection.commit()
+    deleted = cursor.rowcount > 0
+    connection.close()
+    return deleted
+
+
+def update_shoe_by_id(shoe_id, brand, model, year, color):
+    connection = sqlite3.connect('database.db')
+    cursor = connection.cursor()
+    cursor.execute("UPDATE Shoe SET brand = ?, model = ?, year = ?, color = ? WHERE shoe_id = ?",
+                   (brand, model, year, color, shoe_id))
+    connection.commit()
+    updated = cursor.rowcount > 0
+    connection.close()
+    return updated
+
+
+def add_shoe_to_database(brand, model, year, color, admin_id):
+    connection = sqlite3.connect('database.db')
+    cursor = connection.cursor()
+    cursor.execute("INSERT INTO Shoe (brand, model, year, color, creator_id) VALUES (?, ?, ?, ?, ?)",
+                   (brand, model, year, color, admin_id))
+    connection.commit()
+    updated = cursor.rowcount > 0
+    connection.close()
+    return updated
