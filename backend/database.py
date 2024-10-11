@@ -107,7 +107,7 @@ def hash_password(password):
 
 
 def check_password(input_password, stored_hashed_password):
-    return bcrpyy.checkpw(input_password.encode('utf-8'), stored_hashed_password)
+    return bcrypt.checkpw(input_password.encode('utf-8'), stored_hashed_password)
 
 
 def create_user(username, password, date_of_birth, hometown):
