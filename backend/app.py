@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from database import (
     get_all_users, get_user_by_id, get_user_by_name, delete_user_by_id, update_user_by_id, add_user_to_database,
@@ -8,6 +9,13 @@ from database import (
 import uvicorn
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 class UpdateUserPayload(BaseModel):
@@ -155,7 +163,7 @@ def get_shoe(shoe_id: int):
 
 
 @app.delete('/shoes/{shoe_id}')
-def delete_user(shoe_id: int):
+def delete_shoe(shoe_id: int):
     deleted = delete_shoe_by_id(shoe_id)
     if deleted:
         return {'message': 'Shoe deleted successfully'}
