@@ -46,8 +46,7 @@ def init_db():
     model TEXT,
     year INTEGER,
     color TEXT,
-    creator_id INTEGER,
-    FOREIGN KEY (creator_id) REFERENCES Admin(admin_id))"""
+    creator_id INTEGER"""
 
     sql_create_followers = """CREATE TABLE IF NOT EXISTS Followers (
     followers_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -274,11 +273,11 @@ def update_shoe_by_id(shoe_id, brand, model, year, color):
     return updated
 
 
-def add_shoe_to_database(brand, model, year, color, admin_id):
+def add_shoe_to_database(brand, model, year, color):
     connection = sqlite3.connect('database.db')
     cursor = connection.cursor()
-    cursor.execute("INSERT INTO Shoe (brand, model, year, color, creator_id) VALUES (?, ?, ?, ?, ?)",
-                   (brand, model, year, color, admin_id))
+    cursor.execute("INSERT INTO Shoe (brand, model, year, color) VALUES (?, ?, ?, ?)",
+                   (brand, model, year, color))
     connection.commit()
     updated = cursor.rowcount > 0
     connection.close()
