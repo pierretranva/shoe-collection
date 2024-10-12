@@ -46,7 +46,7 @@ def init_db():
     model TEXT,
     year INTEGER,
     color TEXT,
-    creator_id INTEGER"""
+    creator_id INTEGER)"""
 
     sql_create_followers = """CREATE TABLE IF NOT EXISTS Followers (
     followers_id INTEGER PRIMARY KEY AUTOINCREMENT,
