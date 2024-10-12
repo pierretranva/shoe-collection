@@ -14,6 +14,9 @@ export default function MyApp() {
     {operation: 'Update', attributes: ['User', 'Shoe', 'Post']}
   ];
 
+  //Gets entries of the selectedAttribute
+  const [entries, setEntries] = useState([]);
+
   //Defines attribute for delete functionality
   const [deleteID, setDeleteID] = useState("");
   
@@ -50,14 +53,44 @@ export default function MyApp() {
     } else {
       setOperation(null);
     }
+
+    setEntries([]);
+    setDeleteID("");
+    setUserID("");
+    setName("");
+    setPassword("");
+    setDateOfBirth("");
+    setHometown("");
+    setShoeID("");
+    setBrand("");
+    setModel("");
+    setYear("");
+    setColor("");
+    setPostID("");
+    setCaption("");
+    setPictureUrl("");
+    setIsSelling("");
+    setPrice("");
+    setSellingLink("");
+    setPostDate("");
   };
 
-  //Handles delete, insert, and update functionality.
+  //Function to fetch entries from the selected attribute
+  const fetchEntries = async () => {
+    try {
+      const response = await axios.get(`http://127.0.0.1:8000/${selectedAttribute.toLowerCase()}s`);
+      setEntries(response.data);
+    } catch (error) {
+      console.error(`Failed to fetch ${selectedAttribute.toLowerCase()} entries.`);
+    }
+  };
+  
+    //Handles delete, insert, and update functionality.
   const handleDelete = async () => {
     try {
       await axios.delete(`http://127.0.0.1:8000/${selectedAttribute.toLowerCase()}s/${deleteID}`);
+      fetchEntries();
       alert(`${selectedAttribute} with ID ${deleteID} deleted successfully.`);
-      cancelClick();
     } catch (error) {
       alert(`Failed to delete ${selectedAttribute.toLowerCase()} with ID ${deleteID}.`);
     }
@@ -70,7 +103,7 @@ export default function MyApp() {
       payload = {
         name: String(name),
         password: String(password),
-        dateOfBirth: String(dateOfBirth),
+        date_of_birth: String(dateOfBirth),
         hometown: String(hometown),
         }
       } else if (selectedAttribute === "Shoe") {
@@ -84,8 +117,8 @@ export default function MyApp() {
   
     try {
       await axios.put(`http://127.0.0.1:8000/add_${selectedAttribute.toLowerCase()}s`, payload);
+      fetchEntries();
       alert(`${selectedAttribute} inserted successfully.`);
-      cancelClick();
     } catch (error) {
       alert(`Failed to insert ${selectedAttribute.toLowerCase()}.`);
     }
@@ -96,14 +129,14 @@ export default function MyApp() {
     
     if (selectedAttribute === "User") {
       payload = {
-        id: parseInt(userID),
+        user_id: parseInt(userID),
         name: String(name),
-        dateOfBirth: String(dateOfBirth),
+        date_of_birth: String(dateOfBirth),
         hometown: String(hometown),
       }
     } else if (selectedAttribute === "Shoe") {
       payload = {
-        id: parseInt(shoeID),
+        shoe_id: parseInt(shoeID),
         brand: String(brand),
         model: String(model),
         year: parseInt(year),
@@ -111,23 +144,36 @@ export default function MyApp() {
       }
     } else if (selectedAttribute === "Post") {
       payload = {
-        id: parseInt(postID),
+        post_id: parseInt(postID),
         caption: String(caption),
-        pictureUrl: String(pictureUrl),
-        isSelling: parseInt(isSelling),
+        picture_url: String(pictureUrl),
+        is_selling: parseInt(isSelling),
         price: parseFloat(price),
-        sellingLink: String(sellingLink),
-        postDate: String(postDate),
+        selling_link: String(sellingLink),
+        date: String(postDate),
       }
     }
   
     try {
       await axios.put(`http://127.0.0.1:8000/update_${selectedAttribute.toLowerCase()}s`, payload);
+      fetchEntries();
       alert(`${selectedAttribute} updated successfully.`);
-      cancelClick();
     } catch (error) {
       alert(`Failed to update ${selectedAttribute.toLowerCase()}.`);
     }
+  };
+
+  // Renders the list of entries
+  const renderEntries = () => {
+    return (
+      <div style={{fontSize: 'small'}}>
+        {entries.map((entry, index) => (
+          <span key={entry.id}>
+            {JSON.stringify(entry)}{index < entries.length - 1 ? ', ' : ''}
+          </span>
+        ))}
+      </div>
+    );
   };
 
   //Sets up logic for each case that a button gets clicked
@@ -299,6 +345,7 @@ export default function MyApp() {
         {selectedOperation && selectedAttribute && (
           <>
             {renderForm()}
+            {renderEntries()}
           </>
         )}
       </header>
