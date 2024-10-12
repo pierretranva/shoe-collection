@@ -55,7 +55,6 @@ class CreateShoePayload(BaseModel):
     model: str
     year: int
     color: str
-    admin_id: int
 
 
 @app.get("/health")
@@ -182,7 +181,7 @@ def update_user(payload: UpdateShoePayload):
 
 @app.put('/add_shoes')
 def add_user(payload: CreateShoePayload):
-    updated = add_shoe_to_database(payload.brand, payload.model, payload.year, payload.color, payload.admin_id)
+    updated = add_shoe_to_database(payload.brand, payload.model, payload.year, payload.color)
     if updated:
         return {'message': 'Shoe created successfully'}
     else:
