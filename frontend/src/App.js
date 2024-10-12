@@ -30,7 +30,6 @@ export default function MyApp() {
   const [model, setModel] = useState("");
   const [year, setYear] = useState("");
   const [color, setColor] = useState("");
-  const [adminID, setAdminID] = useState("");
 
   //Defines attributes needed for the Post payloads
   const [postID, setPostID] = useState("");
@@ -64,13 +63,72 @@ export default function MyApp() {
     }
   };
 
-  const handleInsert = () => {
+  const handleInsert = async () => {
+    let payload = null;
     
-  }
-
-  const handleUpdate = () => {
+    if (selectedAttribute === "User") {
+      payload = {
+        name: String(name),
+        password: String(password),
+        dateOfBirth: String(dateOfBirth),
+        hometown: String(hometown),
+        }
+      } else if (selectedAttribute === "Shoe") {
+        payload = {
+          brand: String(brand),
+          model: String(model),
+          year: parseInt(year),
+          color: String(color),
+        }
+      }
+  
+    try {
+      await axios.put(`http://127.0.0.1:8000/add_${selectedAttribute.toLowerCase()}s`, payload);
+      alert(`${selectedAttribute} inserted successfully.`);
+      cancelClick();
+    } catch (error) {
+      alert(`Failed to insert ${selectedAttribute.toLowerCase()}.`);
+    }
+  };
+  
+  const handleUpdate = async () => {
+    let payload = null;
     
-  }
+    if (selectedAttribute === "User") {
+      payload = {
+        id: parseInt(userID),
+        name: String(name),
+        dateOfBirth: String(dateOfBirth),
+        hometown: String(hometown),
+      }
+    } else if (selectedAttribute === "Shoe") {
+      payload = {
+        id: parseInt(shoeID),
+        brand: String(brand),
+        model: String(model),
+        year: parseInt(year),
+        color: String(color),
+      }
+    } else if (selectedAttribute === "Post") {
+      payload = {
+        id: parseInt(postID),
+        caption: String(caption),
+        pictureUrl: String(pictureUrl),
+        isSelling: parseInt(isSelling),
+        price: parseFloat(price),
+        sellingLink: String(sellingLink),
+        postDate: String(postDate),
+      }
+    }
+  
+    try {
+      await axios.put(`http://127.0.0.1:8000/update_${selectedAttribute.toLowerCase()}s`, payload);
+      alert(`${selectedAttribute} updated successfully.`);
+      cancelClick();
+    } catch (error) {
+      alert(`Failed to update ${selectedAttribute.toLowerCase()}.`);
+    }
+  };
 
   //Sets up logic for each case that a button gets clicked
   const renderForm = () => {
@@ -132,7 +190,6 @@ export default function MyApp() {
           <p>Model: <input type="text" value={model} onChange={(e) => setModel(e.target.value)} placeholder="Model" /></p>
           <p>Year: <input type="number" value={year} onChange={(e) => setYear(e.target.value)} placeholder="Year" /></p>
           <p>Color: <input type="text" value={color} onChange={(e) => setColor(e.target.value)} placeholder="Color" /></p>
-          <p>Admin ID: <input type="number" value={adminID} onChange={(e) => setAdminID(e.target.value)} placeholder="Admin ID" /></p>
 
           <div className="button">
             <button onClick={handleInsert}>Submit</button>

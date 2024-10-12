@@ -86,7 +86,7 @@ def delete_user(user_id: int):
         raise HTTPException(status_code=404, detail='User not found')
 
 
-@app.put('/update_user')
+@app.put('/update_users')
 def update_user(payload: UpdateUserPayload):
     updated = update_user_by_id(payload.user_id, payload.name, payload.date_of_birth, payload.hometown)
     if updated:
@@ -95,7 +95,7 @@ def update_user(payload: UpdateUserPayload):
         raise HTTPException(status_code=404, detail='User not found')
 
 
-@app.put('/add_user')
+@app.put('/add_users')
 def add_user(payload: CreateUserPayload):
     updated = add_user_to_database(payload.name, payload.password, payload.date_of_birth, payload.hometown)
     if updated:
