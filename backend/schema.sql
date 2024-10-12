@@ -1,0 +1,166 @@
+--Tables
+
+CREATE TABLE IF NOT EXISTS Admin (
+    admin_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT,
+    password TEXT);
+
+
+CREATE TABLE IF NOT EXISTS User (
+    user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL,
+    date_of_birth TEXT, -- Use TEXT to store dates in ISO 8601 format ('YYYY-MM-DD')
+    hometown TEXT);
+
+
+CREATE TABLE IF NOT EXISTS Post (
+    post_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    caption TEXT,
+    picture_url TEXT,
+    is_selling INTEGER,
+    price REAL,
+    selling_link TEXT,
+    date TEXT, -- Use TEXT to store dates in ISO 8601 format ('YYYY-MM-DD')
+    creator_id INTEGER,
+    related_shoe_id INTEGER,
+    FOREIGN KEY (creator_id) REFERENCES User(user_id),
+    FOREIGN KEY (related_shoe_id) REFERENCES Shoe(shoe_id));
+
+
+CREATE TABLE IF NOT EXISTS Shoe (
+    shoe_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    brand TEXT,
+    model TEXT,
+    year INTEGER,
+    color TEXT);
+
+
+CREATE TABLE IF NOT EXISTS Followers (
+    followers_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    follower INTEGER,
+    followee INTEGER,
+    FOREIGN KEY (follower) REFERENCES User(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (followee) REFERENCES User(user_id) ON DELETE CASCADE);
+
+
+CREATE TABLE IF NOT EXISTS Likes (
+    likes_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    post_id INTEGER,
+    user_id INTEGER,
+    FOREIGN KEY (post_id) REFERENCES Post(post_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES User(user_id) ON DELETE CASCADE);
+
+
+CREATE TABLE IF NOT EXISTS Comment (
+    comment_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    text TEXT,
+    date TEXT,
+    creator_id INTEGER,
+    post_id INTEGER,
+    FOREIGN KEY (creator_id) REFERENCES User(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (post_id) REFERENCES Post(post_id) ON DELETE CASCADE);
+
+
+-- Data
+
+INSERT INTO Admin (username, password) VALUES
+    ('admin1', 'password'),
+    ('admin2', 'password'),
+    ('admin3', 'password');
+
+INSERT INTO User (username, password, date_of_birth, hometown) VALUES
+    ('user1', 'password', '1990-01-01', 'Hometown1'),
+    ('user2', 'password', '1991-02-02', 'Hometown2'),
+    ('user3', 'password', '1992-03-03', 'Hometown3'),
+    ('user4', 'password', '1993-04-04', 'Hometown4'),
+    ('user5', 'password', '1994-05-05', 'Hometown5'),
+    ('user6', 'password', '1995-06-06', 'Hometown6'),
+    ('user7', 'password', '1996-07-07', 'Hometown7'),
+    ('user8', 'password', '1997-08-08', 'Hometown8'),
+    ('user9', 'password', '1998-09-09', 'Hometown9'),
+    ('user10', 'password', '1999-10-10', 'Hometown10'),
+    ('user11', 'password', '1990-11-11', 'Hometown11'),
+    ('user12', 'password', '1991-12-12', 'Hometown12'),
+    ('user13', 'password', '1992-01-13', 'Hometown13'),
+    ('user14', 'password', '1993-02-14', 'Hometown14'),
+    ('user15', 'password', '1994-03-15', 'Hometown15'),
+    ('user16', 'password', '1995-04-16', 'Hometown16'),
+    ('user17', 'password', '1996-05-17', 'Hometown17'),
+    ('user18', 'password', '1997-06-18', 'Hometown18'),
+    ('user19', 'password', '1998-07-19', 'Hometown19'),
+    ('user20', 'password', '1999-08-20', 'Hometown20'),
+    ('user21', 'password', '1990-09-21', 'Hometown21'),
+    ('user22', 'password', '1991-10-22', 'Hometown22'),
+    ('user23', 'password', '1992-11-23', 'Hometown23'),
+    ('user24', 'password', '1993-12-24', 'Hometown24'),
+    ('user25', 'password', '1994-01-25', 'Hometown25'),
+    ('user26', 'password', '1995-02-26', 'Hometown26'),
+    ('user27', 'password', '1996-03-27', 'Hometown27'),
+    ('user28', 'password', '1997-04-28', 'Hometown28'),
+    ('user29', 'password', '1998-05-29', 'Hometown29'),
+    ('user30', 'password', '1999-06-30', 'Hometown30');
+
+INSERT INTO Shoe (brand, model, year, color) VALUES
+    ('Nike', 'Air Max', 2020, 'Red'),
+    ('Adidas', 'Ultraboost', 2019, 'Black'),
+    ('Puma', 'RS-X', 2021, 'White'),
+    ('Reebok', 'Classic', 2018, 'Blue'),
+    ('Asics', 'Gel-Lyte', 2022, 'Green'),
+    ('New Balance', '990v5', 2020, 'Grey'),
+    ('Nike', 'Jordan 1', 2021, 'Red/Black'),
+    ('Adidas', 'NMD', 2019, 'White/Blue'),
+    ('Puma', 'Suede', 2020, 'Black/Gold'),
+    ('Reebok', 'Nano X', 2022, 'Orange'),
+    ('Asics', 'Kayano', 2019, 'Pink'),
+    ('New Balance', '574', 2021, 'Navy'),
+    ('Nike', 'Pegasus', 2020, 'Yellow'),
+    ('Adidas', 'Superstar', 2018, 'White/Black'),
+    ('Puma', 'Ignite', 2021, 'Purple'),
+    ('Reebok', 'Zig Kinetica', 2020, 'Green'),
+    ('Asics', 'Nimbus', 2022, 'Blue/White'),
+    ('New Balance', '1080v11', 2021, 'Red'),
+    ('Nike', 'Air Force 1', 2019, 'White'),
+    ('Adidas', 'Gazelle', 2020, 'Black'),
+    ('Puma', 'Future Rider', 2022, 'Blue/Red'),
+    ('Reebok', 'Club C', 2018, 'White/Green'),
+    ('Asics', 'Quantum 360', 2021, 'Black/Gold'),
+    ('New Balance', '1500', 2019, 'Grey/Orange'),
+    ('Nike', 'Blazer', 2020, 'Green'),
+    ('Adidas', 'Stan Smith', 2021, 'White/Green'),
+    ('Puma', 'Cali', 2022, 'Pink/White'),
+    ('Reebok', 'Pump', 2019, 'Blue/Yellow'),
+    ('Asics', 'Noosa Tri', 2020, 'Multi-color'),
+    ('New Balance', '997H', 2021, 'Black/Red');
+
+INSERT INTO Post (caption, picture_url, is_selling, price, selling_link, date, creator_id, related_shoe_id) VALUES
+    ('Great shoes for running!', 'url1', 1, 120.0, 'link1', '2024-01-01', 1, 1),
+    ('Stylish and comfortable', 'url2', 0, NULL, NULL, '2024-01-02', 2, 2),
+    ('Limited edition sneakers', 'url3', 1, 200.0, 'link3', '2024-01-03', 3, 3),
+    ('Perfect for workouts', 'url4', 1, 100.0, 'link4', '2024-01-04', 4, 4),
+    ('Vintage look!', 'url5', 0, NULL, NULL, '2024-01-05', 5, 5),
+    ('Brand new release', 'url6', 1, 150.0, 'link6', '2024-01-06', 6, 6),
+    ('Classic sneakers', 'url7', 1, 110.0, 'link7', '2024-01-07', 7, 7),
+    ('Comfortable walking shoes', 'url8', 0, NULL, NULL, '2024-01-08', 8, 8),
+    ('Great for sports', 'url9', 1, 130.0, 'link9', '2024-01-09', 9, 9),
+    ('Trendy and fashionable', 'url10', 0, NULL, NULL, '2024-01-10', 10, 10),
+    ('Amazing design!', 'url11', 1, 140.0, 'link11', '2024-01-11', 11, 11),
+    ('All-day comfort', 'url12', 0, NULL, NULL, '2024-01-12', 12, 12),
+    ('Top-notch quality', 'url13', 1, 160.0, 'link13', '2024-01-13', 13, 13),
+    ('Limited stock available', 'url14', 1, 170.0, 'link14', '2024-01-14', 14, 14),
+    ('Classic design', 'url15', 0, NULL, NULL, '2024-01-15', 15, 15),
+    ('Perfect for casual wear', 'url16', 1, 90.0, 'link16', '2024-01-16', 16, 16),
+    ('Sporty and stylish', 'url17', 0, NULL, NULL, '2024-01-17', 17, 17),
+    ('High performance', 'url18', 1, 180.0, 'link18', '2024-01-18', 18, 18),
+    ('Comfortable fit', 'url19', 0, NULL, NULL, '2024-01-19', 19, 19),
+    ('Great for running', 'url20', 1, 120.0, 'link20', '2024-01-20', 20, 20),
+    ('Best sneakers this year', 'url21', 1, 190.0, 'link21', '2024-01-21', 21, 21),
+    ('Stylish and affordable', 'url22', 0, NULL, NULL, '2024-01-22', 22, 22),
+    ('Durable and comfy', 'url23', 1, 100.0, 'link23', '2024-01-23', 23, 23),
+    ('Latest trend', 'url24', 1, 150.0, 'link24', '2024-01-24', 24, 24),
+    ('Unique colorway', 'url25', 0, NULL, NULL, '2024-01-25', 25, 25),
+    ('Best value for money', 'url26', 1, 110.0, 'link26', '2024-01-26', 26, 26),
+    ('Classic look', 'url27', 1, 120.0, 'link27', '2024-01-27', 27, 27),
+    ('Great for all activities', 'url28', 0, NULL, NULL, '2024-01-28', 28, 28),
+    ('Awesome sneakers', 'url29', 1, 130.0, 'link29', '2024-01-29', 29, 29),
+    ('New collection', 'url30', 0, NULL, NULL, '2024-01-30', 30, 30);
