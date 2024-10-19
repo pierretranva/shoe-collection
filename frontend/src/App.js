@@ -76,10 +76,15 @@ export default function MyApp() {
   };
 
   //Function to fetch entries from the selected attribute
-  const fetchEntries = async () => {
+  const fetchEntries = async (inputAttribute) => {
     try {
-      const response = await axios.get(`http://127.0.0.1:8000/${selectedAttribute.toLowerCase()}s`);
-      setEntries(response.data);
+      if (inputAttribute) {
+        const response = await axios.get(`http://127.0.0.1:8000/${inputAttribute.toLowerCase()}s`);
+        setEntries(response.data);
+      } else {
+        const response = await axios.get(`http://127.0.0.1:8000/${selectedAttribute.toLowerCase()}s`);
+        setEntries(response.data);
+      }
     } catch (error) {
       console.error(`Failed to fetch ${selectedAttribute.toLowerCase()} entries.`);
     }
@@ -89,7 +94,7 @@ export default function MyApp() {
   const handleDelete = async () => {
     try {
       await axios.delete(`http://127.0.0.1:8000/${selectedAttribute.toLowerCase()}s/${deleteID}`);
-      fetchEntries();
+      await fetchEntries();
       alert(`${selectedAttribute} with ID ${deleteID} deleted successfully.`);
     } catch (error) {
       alert(`Failed to delete ${selectedAttribute.toLowerCase()} with ID ${deleteID}.`);
@@ -117,7 +122,7 @@ export default function MyApp() {
   
     try {
       await axios.put(`http://127.0.0.1:8000/add_${selectedAttribute.toLowerCase()}s`, payload);
-      fetchEntries();
+      await fetchEntries();
       alert(`${selectedAttribute} inserted successfully.`);
     } catch (error) {
       alert(`Failed to insert ${selectedAttribute.toLowerCase()}.`);
@@ -156,25 +161,68 @@ export default function MyApp() {
   
     try {
       await axios.put(`http://127.0.0.1:8000/update_${selectedAttribute.toLowerCase()}s`, payload);
-      fetchEntries();
+      await fetchEntries();
       alert(`${selectedAttribute} updated successfully.`);
     } catch (error) {
       alert(`Failed to update ${selectedAttribute.toLowerCase()}.`);
     }
   };
 
-  // Renders the list of entries
-  const renderEntries = () => {
-    return (
-      <div style={{fontSize: 'small'}}>
-        {entries.map((entry, index) => (
-          <span key={entry.id}>
-            {JSON.stringify(entry)}{index < entries.length - 1 ? ', ' : ''}
-          </span>
-        ))}
-      </div>
+    const Table = ({title, headers, items, renderRow}) => (
+        <div className="table-container">
+            <h1>{title}</h1>
+            <table className="item-table">
+                <thead>
+                <tr>
+                    {headers.map((header, index) => (
+                        <th key={index}>{header}</th>
+                    ))}
+                </tr>
+                </thead>
+                <tbody>
+                {items.map(renderRow)}
+                </tbody>
+            </table>
+        </div>
     );
-  };
+
+    // Renders the table of entries
+    const renderEntries = () => {
+        return (
+            <div>
+                {selectedAttribute === "User" && (
+                    <Table
+                        title="User List"
+                        headers={["Id", "Name", "Date of Birth"]}
+                        items={entries}
+                        renderRow={(user) => (
+                            <tr key={user.user_id}>
+                                <td>{user.user_id}</td>
+                                <td>{user.name}</td>
+                                <td>{user.date_of_birth}</td>
+                            </tr>
+                        )}
+                    />
+                )}
+                {selectedAttribute === "Shoe" && (
+                    <Table
+                        title="Shoe List"
+                        headers={["Id", "Brand", "Model", "Year", "Color"]}
+                        items={entries}
+                        renderRow={(shoe) => (
+                            <tr key={shoe.shoe_id}>
+                                <td>{shoe.shoe_id}</td>
+                                <td>{shoe.brand}</td>
+                                <td>{shoe.model}</td>
+                                <td>{shoe.year}</td>
+                                <td>{shoe.color}</td>
+                            </tr>
+                        )}
+                    />
+                )}
+            </div>
+        );
+    };
 
   //Sets up logic for each case that a button gets clicked
   const renderForm = () => {
@@ -332,7 +380,10 @@ export default function MyApp() {
               {operations
                 .find((operation) => operation.operation === selectedOperation)
                 ?.attributes.map((attribute) => (
-                  <button key={attribute} onClick={() => attributeClick(attribute)}>
+                  <button key={attribute} onClick={() => {
+                    attributeClick(attribute)
+                    fetchEntries(attribute).then();
+                  }}>
                     {attribute}
                   </button>
                 ))}

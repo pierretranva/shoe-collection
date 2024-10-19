@@ -11,3 +11,28 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.table-container {
+    margin-bottom: 20px;
+}
+
+.item-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #242830;
+}
+
+.item-table th, .item-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    color: #fff;
+}
+
+.item-table th {
+    background-color: #444;
+}
+
+.item-table tr:hover {
+    background-color: #2a2e38;
+}
