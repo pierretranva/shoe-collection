@@ -1,10 +1,15 @@
-import './App.css';
+import './AdminPage.css';
 
 import axios from 'axios';
 import { useState } from 'react';
 
 
-export default function MyApp() {
+export default function AdminPage() {
+  const [adminUsername, setAdminUsername] = useState("");
+  const [adminPassword, setAdminPassword] = useState("");
+  const [adminVerified, setAdminVerified] = useState(false);
+  const [loginErrorMessage, setLoginErrorMessage] = useState(false);
+
   //Sets up selected operations and defines current operations and attributes
   const [selectedOperation, setOperation] = useState(null);
   const [selectedAttribute, setAttribute] = useState(null);
@@ -352,54 +357,113 @@ export default function MyApp() {
       );
     }
 
+    const handleAdminLogin = async () => {
+        try {
+            setLoginErrorMessage(false);
+            const loginResponse = await axios.put('http://localhost:8000/admin/login', {
+                "username" : adminUsername,
+                "password" : adminPassword
+            });
 
-  return (
-    <div className="App">
-      <header className="App-header">
-        
-        {/*Loads initial screen to prompt admin to select an operation*/}
-        {!selectedOperation && (
-          <>
-            <h1>Admin Development</h1>
-            <h2>Select The Desired Operation Below:</h2>
-            <div className="button">
-              {operations.map((operation) => (
-                <button key={operation.operation} onClick={() => setOperation(operation.operation)}>
-                  {operation.operation}
-                </button>
-              ))}
-            </div>
-          </>
-        )}
+            const verified = loginResponse.data.status;
+            if (verified) {
+                setLoginErrorMessage(false);
+                setAdminVerified(true);
+            } else {
+                setLoginErrorMessage(true);
+            }
+        } catch (error) {
+            console.error('Admin Login error:', error);
+            setLoginErrorMessage(true);
+        }
+    };
 
-        {/*Prompts the admin to select an attribute*/}
-        {selectedOperation && !selectedAttribute && (
-          <>
-            <h2>Which Attribute Would You Like To {selectedOperation}:</h2>
-            <div className="button">
-              {operations
-                .find((operation) => operation.operation === selectedOperation)
-                ?.attributes.map((attribute) => (
-                  <button key={attribute} onClick={() => {
-                    attributeClick(attribute)
-                    fetchEntries(attribute).then();
-                  }}>
-                    {attribute}
-                  </button>
-                ))}
-              <button onClick={cancelClick}>Cancel</button>
-            </div>
-          </>
-        )}
 
-        {/*Display specific information selected operation and attribute*/}
-        {selectedOperation && selectedAttribute && (
-          <>
-            {renderForm()}
-            {renderEntries()}
-          </>
-        )}
-      </header>
-    </div>
-  );
+    return (
+        <div className="App">
+            <header className="App-header">
+                {adminVerified ? (
+                    <>
+                        {/*Loads initial screen to prompt admin to select an operation*/}
+                        {!selectedOperation && (
+                            <>
+                                <h1>Admin Development</h1>
+                                <h2>Select The Desired Operation Below:</h2>
+                                <div className="button">
+                                    {operations.map((operation) => (
+                                        <button key={operation.operation}
+                                                onClick={() => setOperation(operation.operation)}>
+                                            {operation.operation}
+                                        </button>
+                                    ))}
+                                </div>
+                            </>
+                        )}
+
+                        {/*Prompts the admin to select an attribute*/}
+                        {selectedOperation && !selectedAttribute && (
+                            <>
+                                <h2>Which Attribute Would You Like To {selectedOperation}:</h2>
+                                <div className="button">
+                                    {operations
+                                        .find((operation) => operation.operation === selectedOperation)
+                                        ?.attributes.map((attribute) => (
+                                            <button key={attribute} onClick={() => {
+                                                attributeClick(attribute)
+                                                fetchEntries(attribute).then();
+                                            }}>
+                                                {attribute}
+                                            </button>
+                                        ))}
+                                    <button onClick={cancelClick}>Cancel</button>
+                                </div>
+                            </>
+                        )}
+
+                        {/*Display specific information selected operation and attribute*/}
+                        {selectedOperation && selectedAttribute && (
+                            <>
+                                {renderForm()}
+                                {renderEntries()}
+                            </>
+                        )}
+                    </>
+                ) : (
+                    <>
+                        <h2>Admin Login</h2>
+                        <input
+                            type="text"
+                            placeholder="Email"
+                            value={adminUsername}
+                            onChange={(e) => setAdminUsername(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    handleAdminLogin();
+                                }
+                            }}
+                            style={{margin: '10px', padding: '10px'}}
+                        />
+                        <br/>
+                        <input
+                            type="password"
+                            placeholder="Password"
+                            value={adminPassword}
+                            onChange={(e) => setAdminPassword(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    handleAdminLogin();
+                                }
+                            }}
+                            style={{margin: '10px', padding: '10px'}}
+                        />
+                        <br/>
+                        <button onClick={handleAdminLogin} style={{padding: '10px 20px'}}>
+                            Login
+                        </button>
+                        {loginErrorMessage && <p style={{color: 'red'}}>Failed to Login</p>}
+                    </>)
+                }
+            </header>
+        </div>
+    );
 }

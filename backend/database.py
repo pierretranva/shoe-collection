@@ -197,3 +197,31 @@ def add_shoe_to_database(brand, model, year, color):
     updated = cursor.rowcount > 0
     connection.close()
     return updated
+
+
+def verify_admin(username, password):
+    connection = sqlite3.connect('database.db')
+    cursor = connection.cursor()
+    cursor.execute("SELECT password FROM Admin WHERE username == ?", (username,))
+    row = cursor.fetchone()
+    connection.close()
+
+    if row:
+        stored_password = row[0]
+        if password == stored_password:
+            return True
+    return False
+
+
+def verify_user(username, password):
+    connection = sqlite3.connect('database.db')
+    cursor = connection.cursor()
+    cursor.execute("SELECT password FROM User WHERE username == ?", (username,))
+    row = cursor.fetchone()
+    connection.close()
+
+    if row:
+        stored_password = row[0]
+        if password == stored_password:
+            return True
+    return False

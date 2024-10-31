@@ -5,6 +5,7 @@ from database import (
     get_all_users, get_user_by_id, get_user_by_name, delete_user_by_id, update_user_by_id, add_user_to_database,
     get_all_posts, get_post_by_id, delete_post_by_id, update_post_by_id,
     get_all_shoes, get_shoe_by_id, delete_shoe_by_id, update_shoe_by_id, add_shoe_to_database,
+    verify_admin, verify_user
 )
 import uvicorn
 
@@ -57,9 +58,24 @@ class CreateShoePayload(BaseModel):
     color: str
 
 
+class LoginPayload(BaseModel):
+    username: str
+    password: str
+
+
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+@app.put('/admin/login')
+def login_admin(payload: LoginPayload):
+    return {"status": verify_admin(payload.username, payload.password)}
+
+
+@app.put('/user/login')
+def login_user(payload: LoginPayload):
+    return {"status": verify_user(payload.username, payload.password)}
 
 
 @app.get('/users')
