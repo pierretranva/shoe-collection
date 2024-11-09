@@ -89,7 +89,7 @@ def add_user_to_database(username, password, date_of_birth, hometown):
     connection = sqlite3.connect('database.db')
     cursor = connection.cursor()
     password = hash_password(password)
-    cursor.execute("INSERT INTO User (username, password, date_of_birth, hometown) VALUES (?, ?, ?, ?)",
+    cursor.execute("INSERT or IGNORE INTO User (username, password, date_of_birth, hometown) VALUES (?, ?, ?, ?)",
                    (username, password, date_of_birth, hometown))
     connection.commit()
     updated = cursor.rowcount > 0

@@ -2,6 +2,7 @@ import './UserPage.css';
 import axios from "axios";
 import {useState} from "react";
 import ScrollingList from "./ScrollingList";
+import { NavLink } from 'react-router-dom';
 
 export default function UserPage() {
     const [userUsername, setUserUsername] = useState("");
@@ -82,6 +83,7 @@ export default function UserPage() {
                         <button onClick={handleUserLogin} style={{padding: '10px 20px'}}>
                             Login
                         </button>
+                        <NavLink to="/register" style={{textDecoration: 'none'}}><a style={{color: 'grey', fontSize: '15px'}}>Register Account</a></NavLink>
                         {loginErrorMessage && <p style={{color: 'red'}}>Failed to Login</p>}
                     </>)
                 }

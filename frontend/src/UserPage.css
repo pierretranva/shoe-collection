@@ -18,3 +18,7 @@
   display: flex;
   gap: 30px;
 }
+p {
+  font-size: 20px;
+  color: #818386;
+}
