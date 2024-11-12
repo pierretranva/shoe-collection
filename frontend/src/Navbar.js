@@ -35,7 +35,7 @@ const Navbar = ({ signedIn, handleSignIn, handleLogout }) => {
   };
 
   const handleLogout1 = () => {
-    handleLogout(false);
+    handleLogout();
     handleCloseUserMenu();
   };
 
@@ -159,7 +159,7 @@ const Navbar = ({ signedIn, handleSignIn, handleLogout }) => {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting, i) => (
-                <NavLink key={i} to={setting === 'Logout' ? '/' : `/${setting.toLowerCase()}`} style={{ textDecoration: 'none' }}>
+                <NavLink key={i} to={setting === 'Logout' ? '/login' : `/${setting.toLowerCase()}`} style={{ textDecoration: 'none' }}>
                   <MenuItem key={setting} onClick={setting === 'Logout' ? handleLogout1 : handleCloseUserMenu}>
                     <Typography textAlign="center">{setting}</Typography>
                   </MenuItem>

@@ -2,7 +2,7 @@ import { React, useState } from "react";
 import axios from "axios";
 import { NavLink } from "react-router-dom";
 import "./Login.css"
-const Login = (handleLogin) => {
+const Login = (props) => {
 	const [userUsername, setUserUsername] = useState("");
 	const [userPassword, setUserPassword] = useState("");
 	const [userVerified, setUserVerified] = useState(false);
@@ -20,7 +20,7 @@ const Login = (handleLogin) => {
             if (verified) {
                 setLoginErrorMessage(false);
                 setUserVerified(true);
-                //handleLogin(userObject); //NEED TO PASS USER OBJECT ON LOGIN
+                props.handleLogin(userUsername); 
             } else {
                 setLoginErrorMessage(true);
             }
@@ -35,7 +35,7 @@ const Login = (handleLogin) => {
 			<h2>User Login</h2>
 			<input
 				type="text"
-				placeholder="Email"
+				placeholder="Username"
 				value={userUsername}
 				onChange={(e) => setUserUsername(e.target.value)}
 				onKeyDown={(e) => {

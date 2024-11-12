@@ -2,7 +2,7 @@ import './RegisterAccount.css';
 import axios from "axios";
 import {useState} from "react";
 
-export default function RegisterAccount(OnRegisterSuccess) {
+export default function RegisterAccount(props) {
     const [userUsername, setUserUsername] = useState("");
     const [userPassword, setUserPassword] = useState("");
     const [userDOB, setUserDOB] = useState("");
@@ -14,6 +14,7 @@ export default function RegisterAccount(OnRegisterSuccess) {
 
 
     const handleRegisterUser = async () => {
+        console.log(typeof props.handleRegisterSuccess)
         try {
             setRegisterErrorMessage(false);
             console.log(userUsername, userPassword, userDOB, userHometown)
@@ -34,6 +35,7 @@ export default function RegisterAccount(OnRegisterSuccess) {
                 setUserDOB("");
                 setUserHometown("");
                 // OnRegisterSuccess(registerResponse.data); /##NEED TO PASS USER OBJECT ON REGISTER
+                props.handleRegisterSuccess(userUsername);
             }
         } catch (error) {
             console.error('User Login error:', error);
@@ -64,7 +66,7 @@ export default function RegisterAccount(OnRegisterSuccess) {
                         <h2>Register New User Account</h2>
                         <input
                             type="text"
-                            placeholder="Email"
+                            placeholder="Username"
                             value={userUsername}
                             onChange={(e) => setUserUsername(e.target.value)}
                             onKeyDown={(e) => {

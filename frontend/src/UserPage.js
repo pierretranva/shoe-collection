@@ -4,15 +4,16 @@ import { useState } from "react";
 import ScrollingList from "./ScrollingList";
 import { NavLink } from "react-router-dom";
 
-export default function UserPage() {
-	const [userUsername, setUserUsername] = useState("");
-	const [userPassword, setUserPassword] = useState("");
-	const [userVerified, setUserVerified] = useState(false);
+export default function UserPage(props) {
+	const [userUsername, setUserUsername] = useState(props.username);
+	const [userVerified, setUserVerified] = useState(props.isSignedIn);
 	const [loginErrorMessage, setLoginErrorMessage] = useState(false);
 
 	const [posts, setPosts] = useState([]);
 
 	if (posts.length === 0) {
+        console.log(props)
+        console.log(userUsername)
 		axios.get(`http://127.0.0.1:8000/posts`).then((response) => {
 			setPosts(response.data);
 		});

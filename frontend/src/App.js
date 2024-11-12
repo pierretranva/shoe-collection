@@ -10,6 +10,7 @@ import UserPage from "./UserPage";
 import AdminPage from "./AdminPage";
 import RegisterAccount from "./RegisterAccount";
 import Login from "./Login";
+import Profile from "./Profile";
 
 
 export default function App() {
@@ -19,29 +20,29 @@ export default function App() {
 
     //check to see if user login info is stored in local storage
 	useEffect(() => {
-		if (Object.keys(localStorage).includes("user")) {
+		if (Object.keys(localStorage).includes("username")) {
 			setSignedIn(true);
-			setUser(JSON.parse(localStorage.getItem("user")));
+			setUser(JSON.parse(localStorage.getItem("username")));
 		}
 	}, []);
 
     const handleSignIn = (currentUser) => {
         setSignedIn(true);
-        setUser(user);
-        localStorage.setItem("user", JSON.stringify(user));
-        navigate("/");
+        setUser(currentUser);
+        console.log("just login", currentUser)
+        localStorage.setItem("username", JSON.stringify(currentUser));
+        navigate("/user");
     };
     const handleLogout = () =>{
         setSignedIn(false);
         setUser(null);
         localStorage.clear();
-        navigate("/");
     }
-    const handleRegisterSuccess = (user) =>{
-        setUser(user);
+    const handleRegisterSuccess = (currentUser) =>{
+        setUser(currentUser);
         setSignedIn(true);
-        localStorage.setItem("user", JSON.stringify(user));
-        navigate("/");
+        localStorage.setItem("username", JSON.stringify(currentUser));
+        navigate("/user");
     }
 
 
@@ -50,11 +51,12 @@ export default function App() {
         <Navbar signedIn={signedIn} handleSignIn={handleSignIn} handleLogout={handleLogout} />
 
         <Routes>
-            <Route path="/" element={<UserPage/>}/>
-            <Route path="/user" element={<UserPage/>}/>
+            <Route path="/" element={<UserPage isSignedIn={signedIn} username={user}/>}/>
+            <Route path="/user" element={<UserPage isSignedIn={signedIn} username={user}/>}/>
             <Route path="/admin" element={<AdminPage/>}/>
-            <Route path="/register" element={<RegisterAccount/>}/>
+            <Route path="/register" element={<RegisterAccount handleRegisterSuccess={handleRegisterSuccess}/>}/>
             <Route path="/login" element={<Login handleLogin={handleSignIn}/>}/>
+            {/* <Route path="/profile/:username" element={<Profile/>}/> */}
         </Routes>
         </div>
 	);
