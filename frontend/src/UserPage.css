@@ -1,24 +1,18 @@
-.App {
-  text-align: center;
-}
 
-.App-header {
+.login{
   background-color: #282c34;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
+  text-align: center;
+  min-height: 100vh;
 }
 
 .button {
   color: #282c34;
   display: flex;
   gap: 30px;
-}
-p {
-  font-size: 20px;
-  color: #818386;
 }

@@ -2,7 +2,7 @@ import './RegisterAccount.css';
 import axios from "axios";
 import {useState} from "react";
 
-export default function RegisterAccount() {
+export default function RegisterAccount(OnRegisterSuccess) {
     const [userUsername, setUserUsername] = useState("");
     const [userPassword, setUserPassword] = useState("");
     const [userDOB, setUserDOB] = useState("");
@@ -33,6 +33,7 @@ export default function RegisterAccount() {
                 setUserPassword("");
                 setUserDOB("");
                 setUserHometown("");
+                // OnRegisterSuccess(registerResponse.data); /##NEED TO PASS USER OBJECT ON REGISTER
             }
         } catch (error) {
             console.error('User Login error:', error);
@@ -60,7 +61,7 @@ export default function RegisterAccount() {
     return (
         <div className="App">
             <header className="App-header">
-                        <h2>Register New Account</h2>
+                        <h2>Register New User Account</h2>
                         <input
                             type="text"
                             placeholder="Email"
