@@ -56,7 +56,7 @@ export default function App() {
             <Route path="/admin" element={<AdminPage/>}/>
             <Route path="/register" element={<RegisterAccount handleRegisterSuccess={handleRegisterSuccess}/>}/>
             <Route path="/login" element={<Login handleLogin={handleSignIn}/>}/>
-            {/* <Route path="/profile/:username" element={<Profile/>}/> */}
+            <Route path="/profile/:username" element={<Profile isSignedIn={signedIn} currentUser={user}/>}/>
         </Routes>
         </div>
 	);
