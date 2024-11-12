@@ -222,6 +222,8 @@ def verify_user(username, password):
 
     if row:
         stored_password = row[0]
-        if password == stored_password:
+        # print(stored_password, password)
+        # if password == stored_password:
+        if check_password(password, stored_password):
             return True
     return False

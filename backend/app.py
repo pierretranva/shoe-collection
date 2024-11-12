@@ -113,9 +113,9 @@ def update_user(payload: UpdateUserPayload):
 
 @app.put('/add_users')
 def add_user(payload: CreateUserPayload):
-    print(payload)
+    # print(payload)
     users = get_user_by_name(payload.name)
-    print(users)
+    # print(users)
     if len(get_user_by_name(payload.name))>0:
         raise HTTPException(status_code=404, detail='Username already exists')
     updated = add_user_to_database(payload.name, payload.password, payload.date_of_birth, payload.hometown)
