@@ -63,44 +63,6 @@ CREATE TABLE IF NOT EXISTS Comment (
 
 
 -- Data
-
-INSERT INTO Admin (username, password) VALUES
-    ('admin1', 'password'),
-    ('admin2', 'password'),
-    ('admin3', 'password');
-
-INSERT INTO User (username, password, date_of_birth, hometown) VALUES
-    ('user1', 'password', '1990-01-01', 'Hometown1'),
-    ('user2', 'password', '1991-02-02', 'Hometown2'),
-    ('user3', 'password', '1992-03-03', 'Hometown3'),
-    ('user4', 'password', '1993-04-04', 'Hometown4'),
-    ('user5', 'password', '1994-05-05', 'Hometown5'),
-    ('user6', 'password', '1995-06-06', 'Hometown6'),
-    ('user7', 'password', '1996-07-07', 'Hometown7'),
-    ('user8', 'password', '1997-08-08', 'Hometown8'),
-    ('user9', 'password', '1998-09-09', 'Hometown9'),
-    ('user10', 'password', '1999-10-10', 'Hometown10'),
-    ('user11', 'password', '1990-11-11', 'Hometown11'),
-    ('user12', 'password', '1991-12-12', 'Hometown12'),
-    ('user13', 'password', '1992-01-13', 'Hometown13'),
-    ('user14', 'password', '1993-02-14', 'Hometown14'),
-    ('user15', 'password', '1994-03-15', 'Hometown15'),
-    ('user16', 'password', '1995-04-16', 'Hometown16'),
-    ('user17', 'password', '1996-05-17', 'Hometown17'),
-    ('user18', 'password', '1997-06-18', 'Hometown18'),
-    ('user19', 'password', '1998-07-19', 'Hometown19'),
-    ('user20', 'password', '1999-08-20', 'Hometown20'),
-    ('user21', 'password', '1990-09-21', 'Hometown21'),
-    ('user22', 'password', '1991-10-22', 'Hometown22'),
-    ('user23', 'password', '1992-11-23', 'Hometown23'),
-    ('user24', 'password', '1993-12-24', 'Hometown24'),
-    ('user25', 'password', '1994-01-25', 'Hometown25'),
-    ('user26', 'password', '1995-02-26', 'Hometown26'),
-    ('user27', 'password', '1996-03-27', 'Hometown27'),
-    ('user28', 'password', '1997-04-28', 'Hometown28'),
-    ('user29', 'password', '1998-05-29', 'Hometown29'),
-    ('user30', 'password', '1999-06-30', 'Hometown30');
-
 INSERT INTO Shoe (brand, model, year, color) VALUES
     ('Nike', 'Air Max', 2020, 'Red'),
     ('Adidas', 'Ultraboost', 2019, 'Black'),

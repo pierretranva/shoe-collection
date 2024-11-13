@@ -42,6 +42,7 @@ except:
 
     cur.executescript(sql_script)
     con.close()
+    create_admin("admin", "password")
 
 
 def get_all_users():
