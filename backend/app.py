@@ -1,11 +1,13 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from typing import Optional
 from database import (
     get_all_users, get_user_by_id, get_user_by_name, delete_user_by_id, update_user_by_id, add_user_to_database,
     get_all_posts, get_post_by_id, delete_post_by_id, update_post_by_id,
     get_all_shoes, get_shoe_by_id, delete_shoe_by_id, update_shoe_by_id, add_shoe_to_database,
-    verify_admin, verify_user
+    verify_admin, verify_user, get_all_shoe_brands, get_all_shoe_models, get_all_shoe_colors, add_post_to_database
+    ,get_shoe_id
 )
 import uvicorn
 
@@ -62,6 +64,19 @@ class LoginPayload(BaseModel):
     username: str
     password: str
 
+class AddPostPayload(BaseModel):
+    username: str
+    caption: str
+    picture_url: str
+    is_selling: int
+    price: Optional[float] = None
+    selling_link: Optional[str] = None
+    date: str
+    brand: str
+    model: str
+    year: int
+    color: str
+
 
 @app.get("/health")
 def health():
@@ -92,6 +107,22 @@ def get_user(user_id: int):
     else:
         raise HTTPException(status_code=404, detail='User not found')
 
+@app.get('/shoe/brands')
+def get_shoe_brands():
+    brands = get_all_shoe_brands()
+    print(brands)
+    return brands
+
+@app.get('/shoe/colors')
+def get_shoe_colors():
+    colors = get_all_shoe_colors()
+    return colors
+
+@app.get('/shoe/models/{brand}')
+def get_shoe_models(brand: str):
+    models = get_all_shoe_models(brand)
+    print(models)
+    return models
 
 @app.delete('/users/{user_id}')
 def delete_user(user_id: int):
@@ -101,6 +132,19 @@ def delete_user(user_id: int):
     else:
         raise HTTPException(status_code=404, detail='User not found')
 
+@app.put('/post')
+def add_post(payload: AddPostPayload):
+    userData =get_user_by_name(payload.username)
+    print(userData)
+    shoe_id = get_shoe_id(payload.brand, payload.model, payload.year, payload.color)
+    print(shoe_id)
+    if shoe_id is None:
+        shoe_id  = add_shoe_to_database(payload.brand, payload.model, payload.year, payload.color)
+    updated = add_post_to_database(payload.caption, payload.picture_url, payload.is_selling, payload.price, payload.selling_link, payload.date,userData[0]['user_id'] ,shoe_id)
+    if updated:
+        return {'message': 'Post created successfully'}
+    else:
+        raise HTTPException(status_code=404, detail='Post not created')
 
 @app.put('/update_users')
 def update_user(payload: UpdateUserPayload):

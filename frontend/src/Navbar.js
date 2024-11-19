@@ -39,7 +39,7 @@ const Navbar = ({ signedIn, handleSignIn, handleLogout }) => {
     handleCloseUserMenu();
   };
 
-  const pages = [{ name: 'User', link: '/' }, { name: 'Admin', link: '/admin' }, { name: 'Search', link: '/map' }];
+  const pages = [{ name: 'User', link: '/' }, { name: 'Admin', link: '/admin' }, { name: 'Search', link: '/map' }, {name: 'Create Post', link: '/create'}];
   const settings = signedIn ? ['Profile', 'Logout'] : ['Login', 'Register'];
 
   return (

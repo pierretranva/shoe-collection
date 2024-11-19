@@ -16,6 +16,7 @@ def create_user(username, password, date_of_birth, hometown):
     cursor.execute("INSERT INTO User (username, password, date_of_birth, hometown) VALUES (?, ?, ?, ?)",
                 (username, password, date_of_birth, hometown))
     connection.commit()
+    cursor.close()
     connection.close()
 
 
@@ -24,6 +25,7 @@ def create_admin(username, password):
     cursor = connection.cursor()
     password = hash_password(password)
     cursor.execute("INSERT INTO Admin (username, password) VALUES (?, ?)", (username, password))
+    cursor.close()
     connection.commit()
     connection.close()
 
@@ -41,6 +43,7 @@ except:
         sql_script = sql_file.read()
 
     cur.executescript(sql_script)
+    cur.close()
     con.close()
     create_admin("admin", "password")
 
@@ -50,6 +53,7 @@ def get_all_users():
     cursor = connection.cursor()
     cursor.execute("SELECT * FROM User")
     users = [dict(user_id=row[0], name=row[1], date_of_birth=row[3]) for row in cursor.fetchall()]
+    cursor.close()
     connection.close()
     return users
 
@@ -59,6 +63,7 @@ def get_user_by_id(user_id):
     cursor = connection.cursor()
     cursor.execute("SELECT * FROM User WHERE user_id = ?", (user_id,))
     row = cursor.fetchone()
+    cursor.close()
     connection.close()
     if row:
         return dict(user_id=row[0], name=row[1], date_of_birth=row[3])
@@ -71,6 +76,7 @@ def delete_user_by_id(user_id):
     cursor.execute("DELETE FROM User WHERE user_id = ?", (user_id,))
     connection.commit()
     deleted = cursor.rowcount > 0
+    cursor.close()
     connection.close()
     return deleted
 
@@ -82,6 +88,7 @@ def update_user_by_id(user_id, name, date_of_birth, home_town):
                    (name, date_of_birth, home_town, user_id))
     connection.commit()
     updated = cursor.rowcount > 0
+    cursor.close()
     connection.close()
     return updated
 
@@ -94,6 +101,7 @@ def add_user_to_database(username, password, date_of_birth, hometown):
                    (username, password, date_of_birth, hometown))
     connection.commit()
     updated = cursor.rowcount > 0
+    cursor.close()
     connection.close()
     return updated
 
@@ -103,6 +111,7 @@ def get_user_by_name(name):
     cursor = connection.cursor()
     cursor.execute("SELECT * FROM User WHERE username LIKE ?", (f"%{name}%",))
     users = [dict(user_id=row[0], name=row[1], date_of_birth=row[3]) for row in cursor.fetchall()]
+    cursor.close()
     connection.close()
     return users
 
@@ -110,8 +119,9 @@ def get_user_by_name(name):
 def get_all_posts():
     connection = sqlite3.connect('database.db')
     cursor = connection.cursor()
-    cursor.execute("SELECT * FROM Post")
+    cursor.execute("SELECT * FROM Post ORDER BY date DESC")
     posts = [dict(post_id=row[0], caption=row[1], picture_url=row[2], is_selling=row[3], price=row[4], selling_link=row[5], date=row[6]) for row in cursor.fetchall()]
+    cursor.close()
     connection.close()
     return posts
 
@@ -121,6 +131,7 @@ def get_post_by_id(post_id):
     cursor = connection.cursor()
     cursor.execute("SELECT * FROM Post WHERE post_id = ?", (post_id,))
     row = cursor.fetchone()
+    cursor.close()
     connection.close()
     if row:
         return dict(post_id=row[0], caption=row[1], picture_url=row[2], is_selling=row[3], price=row[4], selling_link=row[5], date=row[6])
@@ -133,6 +144,7 @@ def delete_post_by_id(user_id):
     cursor.execute("DELETE FROM Post WHERE post_id = ?", (user_id,))
     connection.commit()
     deleted = cursor.rowcount > 0
+    cursor.close()
     connection.close()
     return deleted
 
@@ -144,6 +156,7 @@ def update_post_by_id(post_id, caption, picture_url, is_selling, price, selling_
                    (caption, picture_url, is_selling, price, selling_link, date, post_id))
     connection.commit()
     updated = cursor.rowcount > 0
+    cursor.close()
     connection.close()
     return updated
 
@@ -153,6 +166,7 @@ def get_all_shoes():
     cursor = connection.cursor()
     cursor.execute("SELECT * FROM Shoe")
     shoes = [dict(shoe_id=row[0], brand=row[1], model=row[2], year=row[3], color=row[4]) for row in cursor.fetchall()]
+    cursor.close()
     connection.close()
     return shoes
 
@@ -162,6 +176,7 @@ def get_shoe_by_id(shoe_id):
     cursor = connection.cursor()
     cursor.execute("SELECT * FROM Shoe WHERE shoe_id = ?", (shoe_id,))
     row = cursor.fetchone()
+    cursor.close()
     connection.close()
     if row:
         return dict(shoe_id=row[0], brand=row[1], model=row[2], year=row[3], color=row[4])
@@ -174,6 +189,7 @@ def delete_shoe_by_id(shoe_id):
     cursor.execute("DELETE FROM Shoe WHERE shoe_id = ?", (shoe_id,))
     connection.commit()
     deleted = cursor.rowcount > 0
+    cursor.close()
     connection.close()
     return deleted
 
@@ -185,6 +201,7 @@ def update_shoe_by_id(shoe_id, brand, model, year, color):
                    (brand, model, year, color, shoe_id))
     connection.commit()
     updated = cursor.rowcount > 0
+    cursor.close()
     connection.close()
     return updated
 
@@ -195,9 +212,57 @@ def add_shoe_to_database(brand, model, year, color):
     cursor.execute("INSERT INTO Shoe (brand, model, year, color) VALUES (?, ?, ?, ?)",
                    (brand, model, year, color))
     connection.commit()
+    rowid = cursor.lastrowid
+    cursor.close()
+    connection.close()
+    return rowid
+
+def add_post_to_database(caption, picture_url, is_selling, price, selling_link, date, creator_id, related_shoe_id):
+    connection = sqlite3.connect('database.db')
+    cursor = connection.cursor()
+    cursor.execute("INSERT INTO Post (caption, picture_url, is_selling, price, selling_link, date, creator_id, related_shoe_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                   (caption, picture_url, is_selling, price, selling_link, date, creator_id, related_shoe_id))
+    connection.commit()
     updated = cursor.rowcount > 0
+    cursor.close()
     connection.close()
     return updated
+
+def get_all_shoe_brands():
+    connection = sqlite3.connect('database.db')
+    cursor = connection.cursor()
+    cursor.execute("SELECT DISTINCT brand FROM Shoe")
+    brands = [row[0] for row in cursor.fetchall()]
+    cursor.close()
+    connection.close()
+    return brands
+def get_all_shoe_models(brand):
+    connection = sqlite3.connect('database.db')
+    cursor = connection.cursor()
+    cursor.execute("SELECT DISTINCT model FROM Shoe WHERE brand = ?", (brand,))
+    models = [row[0] for row in cursor.fetchall()]
+    cursor.close()
+    connection.close()
+    return models
+def get_all_shoe_colors():
+    connection = sqlite3.connect('database.db')
+    cursor = connection.cursor()
+    cursor.execute("SELECT DISTINCT color FROM Shoe")
+    colors = [row[0] for row in cursor.fetchall()]
+    cursor.close()
+    connection.close()
+    return colors
+
+def get_shoe_id(brand, model, year, color):
+    connection = sqlite3.connect('database.db')
+    cursor = connection.cursor()
+    cursor.execute("SELECT shoe_id FROM Shoe WHERE brand = ? AND model = ? AND year = ? AND color = ?", (brand, model, year, color))
+    row = cursor.fetchone()
+    cursor.close()
+    connection.close()
+    if row:
+        return row[0]
+    return None
 
 
 def verify_admin(username, password):
@@ -205,6 +270,7 @@ def verify_admin(username, password):
     cursor = connection.cursor()
     cursor.execute("SELECT password FROM Admin WHERE username == ?", (username,))
     row = cursor.fetchone()
+    cursor.close()
     connection.close()
 
     if row:
@@ -220,6 +286,7 @@ def verify_user(username, password):
     cursor = connection.cursor()
     cursor.execute("SELECT password FROM User WHERE username == ?", (username,))
     row = cursor.fetchone()
+    cursor.close()
     connection.close()
 
     if row:

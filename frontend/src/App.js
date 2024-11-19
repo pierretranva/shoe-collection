@@ -11,6 +11,7 @@ import AdminPage from "./AdminPage";
 import RegisterAccount from "./RegisterAccount";
 import Login from "./Login";
 import Profile from "./Profile";
+import CreatePost from "./CreatePost";
 
 
 export default function App() {
@@ -56,6 +57,7 @@ export default function App() {
             <Route path="/admin" element={<AdminPage/>}/>
             <Route path="/register" element={<RegisterAccount handleRegisterSuccess={handleRegisterSuccess}/>}/>
             <Route path="/login" element={<Login handleLogin={handleSignIn}/>}/>
+            <Route path="/create" element={<CreatePost isSignedIn={signedIn} username={user}/>}/>
             <Route path="/profile/:username" element={<Profile isSignedIn={signedIn} currentUser={user}/>}/>
         </Routes>
         </div>

@@ -96,7 +96,7 @@ INSERT INTO Shoe (brand, model, year, color) VALUES
     ('New Balance', '997H', 2021, 'Black/Red');
 
 INSERT INTO Post (caption, picture_url, is_selling, price, selling_link, date, creator_id, related_shoe_id) VALUES
-    ('Great shoes for running!', 'url1', 1, 120.0, 'link1', '2024-01-01', 1, 1),
+    ('Great shoes for running!', 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=2970&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', 1, 120.0, 'link1', '2024-01-01', 1, 1),
     ('Stylish and comfortable', 'url2', 0, NULL, NULL, '2024-01-02', 2, 2),
     ('Limited edition sneakers', 'url3', 1, 200.0, 'link3', '2024-01-03', 3, 3),
     ('Perfect for workouts', 'url4', 1, 100.0, 'link4', '2024-01-04', 4, 4),
