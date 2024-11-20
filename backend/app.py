@@ -7,7 +7,7 @@ from database import (
     get_all_posts, get_post_by_id, delete_post_by_id, update_post_by_id,
     get_all_shoes, get_shoe_by_id, delete_shoe_by_id, update_shoe_by_id, add_shoe_to_database,
     verify_admin, verify_user, get_all_shoe_brands, get_all_shoe_models, get_all_shoe_colors, add_post_to_database
-    ,get_shoe_id
+    ,get_shoe_id, user_liked_post
 )
 import uvicorn
 
@@ -178,8 +178,18 @@ def get_users_by_name(name: str):
 
 
 @app.get('/posts')
-def get_posts():
-    posts = get_all_posts()
+def get_posts(username: Optional[str] = None, page_number: Optional[int] = 1):
+    posts = get_all_posts(page_number)
+    if username:
+        for post in posts:
+            if user_liked_post(username, post['post_id']):
+                post['liked'] = True
+            else:
+                post['liked'] = False
+    else:
+        for post in posts:
+            post['liked'] = False
+
     return posts
 
 
