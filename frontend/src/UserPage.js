@@ -14,7 +14,7 @@ export default function UserPage(props) {
 	if (posts.length === 0) {
         console.log(props)
         console.log(userUsername)
-		axios.get(`http://127.0.0.1:8000/posts`).then((response) => {
+		axios.get(`http://127.0.0.1:8000/posts`, {params: {username: props.username, page_number:3}}).then((response) => {
 			setPosts(response.data);
 		});
 	}
