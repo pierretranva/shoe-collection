@@ -28,7 +28,10 @@ const Profile = ({isSignedIn, currentUser, userId}) => {
 
                 axios
                     .get(`http://localhost:8000/unfollow/${encodeURIComponent(userId)}/${encodeURIComponent(user_id)}`)
-                    .then((response) => setIsFollowing(false));
+                    .then((response) => {
+                        setIsFollowing(false);
+                        setFollowers(followers - 1);
+                    });
             });
     };
 
@@ -40,7 +43,10 @@ const Profile = ({isSignedIn, currentUser, userId}) => {
 
                 axios
                     .get(`http://localhost:8000/follow/${encodeURIComponent(user_id)}/${encodeURIComponent(userId)}`)
-                    .then((response) => setIsFollowing(true));
+                    .then((response) => {
+                        setIsFollowing(true);
+                        setFollowers(followers + 1);
+                    });
             });
     };
 

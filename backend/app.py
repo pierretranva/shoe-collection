@@ -6,10 +6,9 @@ from database import (
     get_all_users, get_user_by_id, get_user_by_name, delete_user_by_id, update_user_by_id, add_user_to_database,
     get_all_posts, get_post_by_id, delete_post_by_id, update_post_by_id,
     get_all_shoes, get_shoe_by_id, delete_shoe_by_id, update_shoe_by_id, add_shoe_to_database,
+    get_post_by_userId, number_of_followers, number_of_following, follow, unfollow, is_following,
     verify_admin, verify_user, get_all_shoe_brands, get_all_shoe_models, get_all_shoe_colors, add_post_to_database,
-    get_shoe_id, get_post_by_userId, number_of_followers, number_of_following, follow, unfollow, is_following
-    verify_admin, verify_user, get_all_shoe_brands, get_all_shoe_models, get_all_shoe_colors, add_post_to_database
-    ,get_shoe_id, user_liked_post
+    get_shoe_id, user_liked_post
 )
 import uvicorn
 
