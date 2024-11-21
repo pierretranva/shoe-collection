@@ -6,8 +6,9 @@ from database import (
     get_all_users, get_user_by_id, get_user_by_name, delete_user_by_id, update_user_by_id, add_user_to_database,
     get_all_posts, get_post_by_id, delete_post_by_id, update_post_by_id,
     get_all_shoes, get_shoe_by_id, delete_shoe_by_id, update_shoe_by_id, add_shoe_to_database,
-    verify_admin, verify_user, get_all_shoe_brands, get_all_shoe_models, get_all_shoe_colors, add_post_to_database
-    ,get_shoe_id, user_liked_post
+    get_post_by_userId, number_of_followers, number_of_following, follow, unfollow, is_following,
+    verify_admin, verify_user, get_all_shoe_brands, get_all_shoe_models, get_all_shoe_colors, add_post_to_database,
+    get_shoe_id, user_liked_post
 )
 from database_metrics import (
     get_total_users, get_total_posts, get_total_likes, get_total_comments, get_sum_price, get_oldest_user,
@@ -69,6 +70,7 @@ class LoginPayload(BaseModel):
     username: str
     password: str
 
+
 class AddPostPayload(BaseModel):
     username: str
     caption: str
@@ -95,7 +97,8 @@ def login_admin(payload: LoginPayload):
 
 @app.put('/user/login')
 def login_user(payload: LoginPayload):
-    return {"status": verify_user(payload.username, payload.password)}
+    status, user_id = verify_user(payload.username, payload.password)
+    return {"status": status, "user_id": user_id}
 
 
 @app.get('/users')
@@ -112,22 +115,26 @@ def get_user(user_id: int):
     else:
         raise HTTPException(status_code=404, detail='User not found')
 
+
 @app.get('/shoe/brands')
 def get_shoe_brands():
     brands = get_all_shoe_brands()
     print(brands)
     return brands
 
+
 @app.get('/shoe/colors')
 def get_shoe_colors():
     colors = get_all_shoe_colors()
     return colors
+
 
 @app.get('/shoe/models/{brand}')
 def get_shoe_models(brand: str):
     models = get_all_shoe_models(brand)
     print(models)
     return models
+
 
 @app.delete('/users/{user_id}')
 def delete_user(user_id: int):
@@ -137,19 +144,22 @@ def delete_user(user_id: int):
     else:
         raise HTTPException(status_code=404, detail='User not found')
 
+
 @app.put('/post')
 def add_post(payload: AddPostPayload):
-    userData =get_user_by_name(payload.username)
+    userData = get_user_by_name(payload.username)
     print(userData)
     shoe_id = get_shoe_id(payload.brand, payload.model, payload.year, payload.color)
     print(shoe_id)
     if shoe_id is None:
-        shoe_id  = add_shoe_to_database(payload.brand, payload.model, payload.year, payload.color)
-    updated = add_post_to_database(payload.caption, payload.picture_url, payload.is_selling, payload.price, payload.selling_link, payload.date,userData[0]['user_id'] ,shoe_id)
+        shoe_id = add_shoe_to_database(payload.brand, payload.model, payload.year, payload.color)
+    updated = add_post_to_database(payload.caption, payload.picture_url, payload.is_selling, payload.price,
+                                   payload.selling_link, payload.date, userData[0]['user_id'], shoe_id)
     if updated:
         return {'message': 'Post created successfully'}
     else:
         raise HTTPException(status_code=404, detail='Post not created')
+
 
 @app.put('/update_users')
 def update_user(payload: UpdateUserPayload):
@@ -162,9 +172,7 @@ def update_user(payload: UpdateUserPayload):
 
 @app.put('/add_users')
 def add_user(payload: CreateUserPayload):
-
-
-    if len(get_user_by_name(payload.name))>0:
+    if len(get_user_by_name(payload.name)) > 0:
         raise HTTPException(status_code=404, detail='Username already exists')
     updated = add_user_to_database(payload.name, payload.password, payload.date_of_birth, payload.hometown)
     if updated:
@@ -207,6 +215,41 @@ def get_post(post_id: int):
         raise HTTPException(status_code=404, detail='Post not found')
 
 
+@app.get('/posts/user_id/{user_id}')
+def get_posts_by_username(user_id: int):
+    posts = get_post_by_userId(user_id)
+    if posts:
+        return posts
+    else:
+        raise HTTPException(status_code=404, detail='Post not found')
+
+
+@app.get('/followers/{user_id}')
+def get_followers(user_id: int):
+    count = number_of_followers(user_id)
+    return count
+
+
+@app.get('/following/{user_id}')
+def get_following(user_id: int):
+    count = number_of_following(user_id)
+    return count
+
+
+@app.get('/is_following/{user_id}/{other_user_id}')
+def is_follow_user(user_id: int, other_user_id: int):
+    return {"status": is_following(user_id, other_user_id)}
+
+@app.get('/unfollow/{user_id}/{other_user_id}')
+def unfollow_user(user_id: int, other_user_id: int):
+    unfollow(user_id, other_user_id)
+
+@app.get('/follow/{user_id}/{other_user_id}')
+def follow_user(user_id: int, other_user_id: int):
+    follow(user_id, other_user_id)
+
+
+
 @app.delete('/posts/{post_id}')
 def delete_user(post_id: int):
     deleted = delete_post_by_id(post_id)
@@ -218,7 +261,8 @@ def delete_user(post_id: int):
 
 @app.put('/update_posts')
 def update_user(payload: UpdatePostPayload):
-    updated = update_post_by_id(payload.post_id, payload.caption, payload.picture_url, payload.is_selling, payload.price, payload.selling_link, payload.date)
+    updated = update_post_by_id(payload.post_id, payload.caption, payload.picture_url, payload.is_selling,
+                                payload.price, payload.selling_link, payload.date)
     if updated:
         return {'message': 'Post updated successfully'}
     else:
