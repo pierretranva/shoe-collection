@@ -20,7 +20,7 @@ const Login = (props) => {
             if (verified) {
                 setLoginErrorMessage(false);
                 setUserVerified(true);
-                props.handleLogin(userUsername); 
+                props.handleLogin(userUsername, loginResponse.data.user_id);
             } else {
                 setLoginErrorMessage(true);
             }

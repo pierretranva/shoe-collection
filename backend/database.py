@@ -111,8 +111,7 @@ def add_user_to_database(username, password, date_of_birth, hometown):
 
 
 def get_user_by_name(name):
-    with sqlite3.connect("database.db") as connection:
-        connection = sqlite3.connect("database.db")
+    with sqlite3.connect('database.db') as connection:
         cursor = connection.cursor()
         cursor.execute("SELECT * FROM User WHERE username LIKE ?", (f"%{name}%",))
         users = [
@@ -182,7 +181,7 @@ def user_liked_post(user_id, post_id):
         row = cursor.fetchone()
         cursor.close()
         return row[0] == 1
-    
+
 
 def get_post_by_id(post_id):
     with sqlite3.connect("database.db") as connection:
@@ -201,6 +200,16 @@ def get_post_by_id(post_id):
                 date=row[6],
             )
     return None
+
+
+def get_post_by_userId(user_id):
+    with sqlite3.connect('database.db') as connection:
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM Post WHERE creator_id = ?", (user_id,))
+        posts = [dict(post_id=row[0], caption=row[1], picture_url=row[2], is_selling=row[3], price=row[4],
+                      selling_link=row[5], date=row[6]) for row in cursor.fetchall()]
+        cursor.close()
+    return posts
 
 
 def delete_post_by_id(user_id):
@@ -379,12 +388,57 @@ def verify_admin(username, password):
 def verify_user(username, password):
     with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
-        cursor.execute("SELECT password FROM User WHERE username == ?", (username,))
+        cursor.execute("SELECT password, user_id FROM User WHERE username == ?", (username,))
         row = cursor.fetchone()
         cursor.close()
 
         if row:
             stored_password = row[0]
             if check_password(password, stored_password):
-                return True
+                return True, row[1]
+    return False, -1
+
+
+def number_of_followers(user_id):
+    with sqlite3.connect('database.db') as connection:
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM Followers WHERE followee = ?", (user_id,))
+        rows = cursor.fetchall()
+
+        cursor.close()
+    return len(rows)
+
+
+def number_of_following(user_id):
+    with sqlite3.connect('database.db') as connection:
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM Followers WHERE follower = ?", (user_id,))
+        rows = cursor.fetchall()
+
+        cursor.close()
+    return len(rows)
+
+
+def unfollow(user_id, other_user_id):
+    with sqlite3.connect('database.db') as connection:
+        cursor = connection.cursor()
+        cursor.execute("DELETE FROM Followers WHERE follower = ? AND followee = ?", (user_id, other_user_id))
+        connection.commit()
+        cursor.close()
+
+def follow(user_id, other_user_id):
+    with sqlite3.connect('database.db') as connection:
+        cursor = connection.cursor()
+        cursor.execute("INSERT INTO Followers (follower, followee) VALUES (?, ?)", (other_user_id, user_id))
+        connection.commit()
+        cursor.close()
+
+def is_following(user_id, other_user_id):
+    with sqlite3.connect('database.db') as connection:
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM Followers WHERE follower = ? AND followee = ?", (user_id, other_user_id))
+        rows = cursor.fetchall()
+        cursor.close()
+        if rows:
+            return True
     return False
