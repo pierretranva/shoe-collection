@@ -69,7 +69,7 @@ def get_user_by_id(user_id):
         row = cursor.fetchone()
         cursor.close()
         if row:
-            return dict(user_id=row[0], name=row[1], date_of_birth=row[3])
+            return dict(user_id=row[0], name=row[1], date_of_birth=row[3], hometown=row[4])
     return None
 
 
@@ -89,6 +89,18 @@ def update_user_by_id(user_id, name, date_of_birth, home_town):
         cursor.execute(
             "UPDATE User SET username = ?, date_of_birth = ?, hometown = ? WHERE user_id = ?",
             (name, date_of_birth, home_town, user_id),
+        )
+        connection.commit()
+        updated = cursor.rowcount > 0
+        cursor.close()
+    return updated
+
+def edit_user_profile_by_id(user_id, password, date_of_birth, home_town):
+    with sqlite3.connect("database.db") as connection:
+        cursor = connection.cursor()
+        cursor.execute(
+            "UPDATE User SET password = ?, date_of_birth = ?, hometown = ? WHERE user_id = ?",
+            (hash_password(password), date_of_birth, home_town, user_id),
         )
         connection.commit()
         updated = cursor.rowcount > 0

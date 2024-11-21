@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {Avatar, Box, Typography, Button, Stack, IconButton} from '@mui/material';
+import {Avatar, Box, Typography, Button, Stack, IconButton, TextField} from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import {useNavigate, useParams} from 'react-router-dom';
 import axios from "axios";
@@ -13,12 +13,32 @@ const Profile = ({isSignedIn, currentUser, userId}) => {
     const [following, setFollowing] = useState(0);
     const [isFollowing, setIsFollowing] = useState(false);
 
+    const [isEditingProfile, setIsEditingProfile] = useState(false);
+    const [password, setPassword] = useState("");
+    const [date, setDate] = useState("");
+    const [hometown, setHometown] = useState("");
+
     const navigate = useNavigate();
 
     const handleHomeClick = () => {
         navigate('/');
     };
 
+    const handleEditProfileClick = () => {
+        setIsEditingProfile(true);
+    };
+
+    const handleSaveProfileClick = () => {
+        axios.put("http://localhost:8000/edit_profile", {
+            "user_id": userId,
+            "password": password,
+            "date_of_birth": date,
+            "hometown": hometown
+        }).then(() => {
+            setPassword("");
+            setIsEditingProfile(false);
+        })
+    };
 
     const handleUnfollowClick = () => {
         axios
@@ -33,7 +53,8 @@ const Profile = ({isSignedIn, currentUser, userId}) => {
                         setFollowers(followers - 1);
                     });
             });
-    };
+    }
+
 
     const handleFollowClick = () => {
         axios
@@ -48,8 +69,11 @@ const Profile = ({isSignedIn, currentUser, userId}) => {
                         setFollowers(followers + 1);
                     });
             });
-    };
+    }
 
+    const handleCancelEditClick = () => {
+        setIsEditingProfile(false);
+    };
 
     useEffect(() => {
         setUserPosts([]);
@@ -87,11 +111,40 @@ const Profile = ({isSignedIn, currentUser, userId}) => {
                 axios
                     .get(`http://localhost:8000/following/${encodeURIComponent(userId)}`)
                     .then((response) => setFollowing(response.data));
+                axios.get(`http://localhost:8000/users/${encodeURIComponent(userId)}`)
+                    .then((response) => {
+                        setDate(response.data["date_of_birth"])
+                        setHometown(response.data["hometown"])
+                    });
             }
         }
 
     }, [username, userId]);
 
+    if (isEditingProfile) {
+        return (
+            <Box sx={{maxWidth: 600, margin: 'auto', padding: 2}}>
+                <Typography variant="h4" marginBottom={2}>Edit Profile</Typography>
+                <TextField label="Password" type="password" fullWidth margin="normal" value={password}
+                           onChange={(e) => setPassword(e.target.value)}/>
+                <TextField
+                    label="Date of Birth"
+                    type="date"
+                    InputLabelProps={{shrink: true}}
+                    fullWidth
+                    margin="normal"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                />
+                <TextField label="Hometown" fullWidth margin="normal" value={hometown}
+                           onChange={(e) => setHometown(e.target.value)}/>
+                <Stack direction="row" spacing={2} marginTop={2}>
+                    <Button variant="contained" onClick={handleSaveProfileClick}>Save</Button>
+                    <Button variant="outlined" onClick={handleCancelEditClick}>Cancel</Button>
+                </Stack>
+            </Box>
+        );
+    }
 
     return (
         <Box sx={{maxWidth: 600, margin: 'auto', padding: 2}}>
@@ -104,12 +157,11 @@ const Profile = ({isSignedIn, currentUser, userId}) => {
                 <Box flex="1">
                     <Typography variant="h6">{username}</Typography>
                     <Stack direction="row" spacing={2} mt={1}>
-                        {/* NEED TO CHECK IF FOLLOWING CURRENT USER */}
                         {(isSignedIn && (!username || currentUser === username)) ?
-                            <Button variant="outlined">Edit Profile</Button> :
-                            (isFollowing ? <Button variant="outlined" onClick={handleUnfollowClick}>Unfollow</Button> :
+                            <Button variant="outlined" onClick={handleEditProfileClick}>Edit Profile</Button> :
+                            (isFollowing ?
+                                <Button variant="outlined" onClick={handleUnfollowClick}>Unfollow</Button> :
                                 <Button variant="outlined" onClick={handleFollowClick}>Follow</Button>)}
-                        {/*<Button variant="outlined">Message</Button>*/}
                         <IconButton onClick={handleHomeClick}>
                             <HomeIcon/>
                         </IconButton>
@@ -124,10 +176,8 @@ const Profile = ({isSignedIn, currentUser, userId}) => {
                 <Typography>{following} following</Typography>
             </Box>
 
-
             {/* Posts Grid */}
             {ScrollingList(userPosts)}
-
         </Box>
     );
 };

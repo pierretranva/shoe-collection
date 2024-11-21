@@ -8,7 +8,7 @@ from database import (
     get_all_shoes, get_shoe_by_id, delete_shoe_by_id, update_shoe_by_id, add_shoe_to_database,
     get_post_by_userId, number_of_followers, number_of_following, follow, unfollow, is_following,
     verify_admin, verify_user, get_all_shoe_brands, get_all_shoe_models, get_all_shoe_colors, add_post_to_database,
-    get_shoe_id, user_liked_post
+    get_shoe_id, user_liked_post, edit_user_profile_by_id
 )
 from database_metrics import (
     get_total_users, get_total_posts, get_total_likes, get_total_comments, get_sum_price, get_oldest_user,
@@ -30,6 +30,12 @@ app.add_middleware(
 class UpdateUserPayload(BaseModel):
     user_id: int
     name: str
+    date_of_birth: str
+    hometown: str
+
+class EditProfileUserPayload(BaseModel):
+    user_id: int
+    password: str
     date_of_birth: str
     hometown: str
 
@@ -164,6 +170,15 @@ def add_post(payload: AddPostPayload):
 @app.put('/update_users')
 def update_user(payload: UpdateUserPayload):
     updated = update_user_by_id(payload.user_id, payload.name, payload.date_of_birth, payload.hometown)
+    if updated:
+        return {'message': 'User updated successfully'}
+    else:
+        raise HTTPException(status_code=404, detail='User not found')
+
+
+@app.put('/edit_profile')
+def edit_profile(payload: EditProfileUserPayload):
+    updated = edit_user_profile_by_id(payload.user_id, payload.password, payload.date_of_birth, payload.hometown)
     if updated:
         return {'message': 'User updated successfully'}
     else:
