@@ -9,6 +9,11 @@ from database import (
     verify_admin, verify_user, get_all_shoe_brands, get_all_shoe_models, get_all_shoe_colors, add_post_to_database
     ,get_shoe_id, user_liked_post
 )
+from database_metrics import (
+    get_total_users, get_total_posts, get_total_likes, get_total_comments, get_sum_price, get_oldest_user,
+    get_youngest_user, get_avg_price, get_avg_year, get_most_expensive_shoe, get_user_post_count,
+    get_user_follower_count, get_for_sale_posts, get_following_count, get_favorite_shoe_brand
+)
 import uvicorn
 
 app = FastAPI()
@@ -260,6 +265,127 @@ def add_user(payload: CreateShoePayload):
         return {'message': 'Shoe created successfully'}
     else:
         raise HTTPException(status_code=404, detail='Shoe not created')
+    
+#Get Endpoints for Metrics:
+@app.get('/get_total_users')
+def total_users():
+    metric = get_total_users()
+    if metric:
+        return metric
+    else:
+        return 0
+    
+@app.get('/get_total_posts')
+def total_posts():
+    metric = get_total_posts()
+    if metric:
+        return metric
+    else:
+        raise HTTPException(status_code=404, detail='Metric Created Unsuccessfully')
+    
+@app.get('/get_total_likes')
+def total_likes():
+    metric = get_total_likes()
+    if metric:
+        return metric
+    else:
+        return 0
+    
+@app.get('/get_total_comments')
+def total_comments():
+    metric = get_total_comments()
+    if metric:
+        return metric
+    else:
+        return 0
+    
+@app.get('/get_sum_price')
+def sum_price():
+    metric = get_sum_price()
+    if metric:
+        return metric
+    else:
+        raise HTTPException(status_code=404, detail='Metric Created Unsuccessfully')
+
+@app.get('/get_oldest_user')
+def oldest_user():
+    metric = get_oldest_user()
+    if metric:
+        return metric
+    else:
+        return "No Users in Database"
+    
+@app.get('/get_youngest_user')
+def yougest_user():
+    metric = get_youngest_user()
+    if metric:
+        return metric
+    else:
+        return "No Users in Database"
+    
+@app.get('/get_avg_price')
+def avg_price():
+    metric = get_avg_price()
+    if metric:
+        return metric
+    else:
+        raise HTTPException(status_code=404, detail='Metric Created Unsuccessfully')
+    
+@app.get('/get_avg_year')
+def avg_year():
+    metric = get_avg_year()
+    if metric:
+        return metric
+    else:
+        raise HTTPException(status_code=404, detail='Metric Created Unsuccessfully')
+    
+@app.get('/get_most_expensive_shoe')
+def most_expensive_shoe():
+    metric = get_most_expensive_shoe()
+    if metric:
+        return metric
+    else:
+        raise HTTPException(status_code=404, detail='Metric Created Unsuccessfully')
+
+@app.get('/get_user_post_count/{user_id}')
+def user_post_count(user_id):
+    metric = get_user_post_count(user_id)
+    if metric:
+        return metric
+    else:
+        raise HTTPException(status_code=404, detail='Metric Created Unsuccessfully')
+    
+@app.get('/get_user_follower_count/{user_id}')
+def user_follower_count(user_id):
+    metric = get_user_follower_count(user_id)
+    if metric:
+        return metric
+    else:
+        return 0
+    
+@app.get('/get_following_count/{user_id}')
+def following_count(user_id):
+    metric = get_following_count(user_id)
+    if metric:
+        return metric
+    else:
+        return 0
+    
+@app.get('/get_for_sale_posts/{user_id}')
+def for_sale_posts(user_id):
+    metric = get_for_sale_posts(user_id)
+    if metric:
+        return metric
+    else:
+        return 0
+    
+@app.get('/get_favorite_shoe_brand/{user_id}')
+def favorite_shoe_brand(user_id):
+    metric = get_favorite_shoe_brand(user_id)
+    if metric:
+        return metric
+    else:
+        raise HTTPException(status_code=404, detail='Metric Created Unsuccessfully')
 
 
 if __name__ == "__main__":

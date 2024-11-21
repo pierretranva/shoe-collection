@@ -12,12 +12,11 @@ def get_total_users():
     return total_users
 
 def get_total_posts():
-    connection = sqlite3.connect("database.db")
-    cursor = connection.cursor()
-    cursor.execute("SELECT COUNT(*) FROM Post")
-    total_posts = cursor.fetchone()[0]  
-    cursor.close()
-    connection.close()
+    with sqlite3.connect("database.db") as connection:
+        cursor = connection.cursor()
+        cursor.execute("SELECT COUNT(*) FROM Post")
+        total_posts = cursor.fetchone()[0]  
+        cursor.close()
     return total_posts
 
 def get_total_likes():
@@ -52,19 +51,23 @@ def get_oldest_user():
     connection = sqlite3.connect("database.db")
     cursor = connection.cursor()
     cursor.execute("SELECT username FROM User WHERE date_of_birth = (SELECT MIN(date_of_birth) FROM User)")
-    min_user = cursor.fetchone()[0]  
+    min_user = cursor.fetchone()
     cursor.close()
     connection.close()
-    return min_user
+    if min_user:
+        return min_user[0]
+    return None
 
 def get_youngest_user():
     connection = sqlite3.connect("database.db")
     cursor = connection.cursor()
     cursor.execute("SELECT username FROM User WHERE date_of_birth = (SELECT MAX(date_of_birth) FROM User)")
-    max_user = cursor.fetchone()[0]  
+    max_user = cursor.fetchone()
     cursor.close()
     connection.close()
-    return max_user
+    if max_user:
+        return max_user[0]
+    return None
 
 def get_avg_price():
     connection = sqlite3.connect("database.db")
@@ -141,5 +144,3 @@ def get_favorite_shoe_brand(user_id):
     brand_counts = brands.value_counts() 
 
     return brand_counts.idxmax()
-
-
