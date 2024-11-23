@@ -53,7 +53,7 @@ export default function App() {
 
 	return (
     <div className="OuterContainer">
-        <Navbar signedIn={signedIn} handleSignIn={handleSignIn} handleLogout={handleLogout} />
+        <Navbar username={user} signedIn={signedIn} handleSignIn={handleSignIn} handleLogout={handleLogout} />
 
         <Routes>
             <Route path="/" element={<UserPage isSignedIn={signedIn} username={user}/>}/>

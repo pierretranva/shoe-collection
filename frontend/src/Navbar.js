@@ -14,7 +14,7 @@ import MenuItem from '@mui/material/MenuItem';
 import MergeIcon from '@mui/icons-material/Merge';
 import { NavLink } from 'react-router-dom';
 
-const Navbar = ({ signedIn, handleSignIn, handleLogout }) => {
+const Navbar = ({ username, signedIn, handleSignIn, handleLogout }) => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -38,6 +38,13 @@ const Navbar = ({ signedIn, handleSignIn, handleLogout }) => {
     handleLogout();
     handleCloseUserMenu();
   };
+  const handleProfileOrLogin = (setting)  => {
+    if (setting === 'Logout') {
+      return "/login";
+    }
+    else {}
+
+  }
 
   const pages = [{ name: 'User', link: '/' }, { name: 'Admin', link: '/admin' }, { name: 'Search', link: '/map' }, {name: 'Create Post', link: '/create'}];
   const settings = signedIn ? ['Profile', 'Logout'] : ['Login', 'Register'];
@@ -159,7 +166,7 @@ const Navbar = ({ signedIn, handleSignIn, handleLogout }) => {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting, i) => (
-                <NavLink key={i} to={setting === 'Logout' ? '/login' : `/${setting.toLowerCase()}`} style={{ textDecoration: 'none' }}>
+                <NavLink key={i} to={setting === 'Logout' ? '/login' : `/${setting.toLowerCase()+ "/username"}`} style={{ textDecoration: 'none' }}>
                   <MenuItem key={setting} onClick={setting === 'Logout' ? handleLogout1 : handleCloseUserMenu}>
                     <Typography textAlign="center">{setting}</Typography>
                   </MenuItem>
