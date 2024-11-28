@@ -95,10 +95,10 @@ const Profile = () => {
 				.get(`http://localhost:8000/following/${encodeURIComponent(userId)}`)
 				.then((response) => setFollowing(response.data));
             axios
-                .get(`http://localhost:8000/get_for_sale_posts/${encodeURIComponent(user_id)}`)
+                .get(`http://localhost:8000/get_for_sale_posts/${encodeURIComponent(userId)}`)
                 .then((response) => setPostsForSale(response.data));
             axios
-                .get(`http://localhost:8000/get_favorite_shoe_brand/${encodeURIComponent(user_id)}`)
+                .get(`http://localhost:8000/get_favorite_shoe_brand/${encodeURIComponent(userId)}`)
                 .then((response) => setFavoriteBrand(response.data));
 		} else if (signedIn) {
 			try {
@@ -115,10 +115,10 @@ const Profile = () => {
 						.get(`http://localhost:8000/following/${encodeURIComponent(profile_user_id)}`)
 						.then((response) => setFollowing(response.data));
                     axios
-                        .get(`http://localhost:8000/get_for_sale_posts/${encodeURIComponent(user_id)}`)
+                        .get(`http://localhost:8000/get_for_sale_posts/${encodeURIComponent(profile_user_id)}`)
                         .then((response) => setPostsForSale(response.data));
                     axios
-                        .get(`http://localhost:8000/get_favorite_shoe_brand/${encodeURIComponent(user_id)}`)
+                        .get(`http://localhost:8000/get_favorite_shoe_brand/${encodeURIComponent(profile_user_id)}`)
                         .then((response) => setFavoriteBrand(response.data));
 					axios
 						.get(
