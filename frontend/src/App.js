@@ -11,6 +11,7 @@ import RegisterAccount from "./RegisterAccount";
 import Login from "./Login";
 import Profile from "./Profile";
 import CreatePost from "./CreatePost";
+import Metrics from "./Metrics";
 
 export default function App() {
 	return (
@@ -26,6 +27,7 @@ export default function App() {
 					<Route path="/create" element={<CreatePost />} />
 					<Route path="/profile/:profileUsername" element={<Profile />} />
 					<Route path="/profile" element={<Profile />} />
+					<Route path="/metrics" element={<Metrics />} />
 				</Routes>
 			</Box>
 		</AuthProvider>
