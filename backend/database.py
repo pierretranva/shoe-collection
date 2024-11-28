@@ -69,7 +69,9 @@ def get_user_by_id(user_id):
         row = cursor.fetchone()
         cursor.close()
         if row:
-            return dict(user_id=row[0], name=row[1], date_of_birth=row[3], hometown=row[4])
+            return dict(
+                user_id=row[0], name=row[1], date_of_birth=row[3], hometown=row[4]
+            )
     return None
 
 
@@ -95,6 +97,7 @@ def update_user_by_id(user_id, name, date_of_birth, home_town):
         cursor.close()
     return updated
 
+
 def edit_user_profile_by_id(user_id, password, date_of_birth, home_town):
     with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
@@ -107,6 +110,7 @@ def edit_user_profile_by_id(user_id, password, date_of_birth, home_town):
         cursor.close()
     return updated
 
+
 def get_id_by_username(username):
     with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
@@ -116,6 +120,8 @@ def get_id_by_username(username):
         if row:
             return row[0]
     return None
+
+
 def add_user_to_database(username, password, date_of_birth, hometown):
     with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
@@ -128,31 +134,49 @@ def add_user_to_database(username, password, date_of_birth, hometown):
         id = get_id_by_username(username)
         cursor.close()
     return username, id
+
+
 def get_post_comments(post_id):
-    with sqlite3.connect('database.db') as connection:
+    with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT Comment.comment_id, Comment.text, Comment.date, Comment.creator_id, Comment.post_id, User.username
             FROM Comment
             JOIN User ON Comment.creator_id = User.user_id
             WHERE Comment.post_id = ?
             ORDER BY Comment.date ASC
-        """, (post_id,))
+        """,
+            (post_id,),
+        )
         comments = [
-            dict(comment_id=row[0], text=row[1], date=row[2], creator_id=row[3], post_id=row[4], username=row[5])
+            dict(
+                comment_id=row[0],
+                text=row[1],
+                date=row[2],
+                creator_id=row[3],
+                post_id=row[4],
+                username=row[5],
+            )
             for row in cursor.fetchall()
         ]
         cursor.close()
     return comments
+
+
 def add_post_comment():
-    with sqlite3.connect('database.db') as connection:
+    with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
-        cursor.execute("INSERT INTO Comment (text, date, creator_id, post_id) VALUES (?, ?, ?, ?)", (text, date, creator_id, post_id))
+        cursor.execute(
+            "INSERT INTO Comment (text, date, creator_id, post_id) VALUES (?, ?, ?, ?)",
+            (text, date, creator_id, post_id),
+        )
         connection.commit()
         cursor.close()
 
+
 def get_user_by_name(name):
-    with sqlite3.connect('database.db') as connection:
+    with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
         cursor.execute("SELECT * FROM User WHERE username LIKE ?", (f"%{name}%",))
         users = [
@@ -166,7 +190,7 @@ def get_user_by_name(name):
 def get_all_posts(page_number):
     with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
-        offset_start = (page_number -1) * 10
+        offset_start = (page_number - 1) * 10
         query = """
         SELECT 
             Post.post_id, 
@@ -191,7 +215,9 @@ def get_all_posts(page_number):
         GROUP BY Post.post_id
         ORDER BY Post.date DESC
         LIMIT 10 OFFSET 
-        """+ str(offset_start)
+        """ + str(
+            offset_start
+        )
         cursor.execute(query)
         posts = [
             dict(
@@ -215,10 +241,15 @@ def get_all_posts(page_number):
         cursor.close()
 
     return posts
+
+
 def user_liked_post(user_id, post_id):
     with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
-        cursor.execute("SELECT EXISTS(SELECT 1 FROM Likes WHERE user_id = ? AND post_id = ?) as liked", (user_id, post_id))
+        cursor.execute(
+            "SELECT EXISTS(SELECT 1 FROM Likes WHERE user_id = ? AND post_id = ?) as liked",
+            (user_id, post_id),
+        )
         row = cursor.fetchone()
         cursor.close()
         return row[0] == 1
@@ -472,7 +503,9 @@ def verify_admin(username, password):
 def verify_user(username, password):
     with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
-        cursor.execute("SELECT password, user_id FROM User WHERE username == ?", (username,))
+        cursor.execute(
+            "SELECT password, user_id FROM User WHERE username == ?", (username,)
+        )
         row = cursor.fetchone()
         cursor.close()
 
@@ -484,7 +517,7 @@ def verify_user(username, password):
 
 
 def number_of_followers(user_id):
-    with sqlite3.connect('database.db') as connection:
+    with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
         cursor.execute("SELECT * FROM Followers WHERE followee = ?", (user_id,))
         rows = cursor.fetchall()
@@ -494,7 +527,7 @@ def number_of_followers(user_id):
 
 
 def number_of_following(user_id):
-    with sqlite3.connect('database.db') as connection:
+    with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
         cursor.execute("SELECT * FROM Followers WHERE follower = ?", (user_id,))
         rows = cursor.fetchall()
@@ -504,59 +537,87 @@ def number_of_following(user_id):
 
 
 def unfollow(user_id, other_user_id):
-    with sqlite3.connect('database.db') as connection:
+    with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
-        cursor.execute("DELETE FROM Followers WHERE follower = ? AND followee = ?", (user_id, other_user_id))
+        cursor.execute(
+            "DELETE FROM Followers WHERE follower = ? AND followee = ?",
+            (user_id, other_user_id),
+        )
         connection.commit()
         cursor.close()
+
 
 def follow(user_id, other_user_id):
-    with sqlite3.connect('database.db') as connection:
+    with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
-        cursor.execute("INSERT INTO Followers (follower, followee) VALUES (?, ?)", (other_user_id, user_id))
+        cursor.execute(
+            "INSERT INTO Followers (follower, followee) VALUES (?, ?)",
+            (other_user_id, user_id),
+        )
         connection.commit()
         cursor.close()
 
+
 def is_following(user_id, other_user_id):
-    with sqlite3.connect('database.db') as connection:
+    with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
-        cursor.execute("SELECT * FROM Followers WHERE follower = ? AND followee = ?", (user_id, other_user_id))
+        cursor.execute(
+            "SELECT * FROM Followers WHERE follower = ? AND followee = ?",
+            (user_id, other_user_id),
+        )
         rows = cursor.fetchall()
         cursor.close()
         if rows:
             return True
     return False
 
+
 def add_comment_to_post(post_id, user_id, text, date):
-    with sqlite3.connect('database.db') as connection:
+    with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
-        cursor.execute("INSERT INTO Comment (creator_id, post_id, text, date) VALUES (?, ?, ?, ?)", (user_id, post_id, text, date))
+        cursor.execute(
+            "INSERT INTO Comment (creator_id, post_id, text, date) VALUES (?, ?, ?, ?)",
+            (user_id, post_id, text, date),
+        )
         connection.commit()
         cursor.close()
 
+
 def db_like_post(post_id, user_id):
-    with sqlite3.connect('database.db') as connection:
+    with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
-        cursor.execute("INSERT INTO Likes (user_id, post_id) VALUES (?, ?)", (user_id, post_id))
+        cursor.execute(
+            "INSERT INTO Likes (user_id, post_id) VALUES (?, ?)", (user_id, post_id)
+        )
         connection.commit()
         cursor.close()
+
+
 def db_unlike_post(post_id, user_id):
-    with sqlite3.connect('database.db') as connection:
+    with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
-        cursor.execute("DELETE FROM Likes WHERE user_id = ? AND post_id = ?", (user_id, post_id))
+        cursor.execute(
+            "DELETE FROM Likes WHERE user_id = ? AND post_id = ?", (user_id, post_id)
+        )
         connection.commit()
         cursor.close()
+
+
 def get_post_likes(post_id):
-    with sqlite3.connect('database.db') as connection:
+    with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
         cursor.execute("SELECT * FROM Likes WHERE post_id = ?", (post_id,))
         rows = cursor.fetchall()
         cursor.close()
     return len(rows)
+
+
 def get_if_user_likes_post(user_id, post_id):
-    with sqlite3.connect('database.db') as connection:
+    with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
-        cursor.execute("SELECT * FROM Likes WHERE user_id = ? AND post_id = ?", (user_id, post_id))
+        cursor.execute(
+            "SELECT * FROM Likes WHERE user_id = ? AND post_id = ?", (user_id, post_id)
+        )
         rows = cursor.fetchall()
         cursor.close()
     if rows:

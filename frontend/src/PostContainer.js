@@ -144,7 +144,7 @@ const PostCard = (props) => {
 				<IconButton onClick={handleLike}>
 					{isLiked ? <FavoriteIcon sx={{ color: "rgba(255,48,64,1)" }} /> : <FavoriteBorderOutlinedIcon />}
 				</IconButton>
-				<IconButton onClick={handleGetComments} >
+				<IconButton onClick={handleGetComments}>
 					<CommentIcon />
 				</IconButton>
 			</CardActions>

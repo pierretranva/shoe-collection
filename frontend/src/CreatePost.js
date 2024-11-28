@@ -27,7 +27,7 @@ const CreatePost = (props) => {
 	const [validShoeBrands, setValidShoeBrands] = useState([]);
 	const [validShoeModels, setValidShoeModels] = useState([]);
 	const [validShoeColors, setValidShoeColors] = useState([]);
-    const {username, signedIn} = useContext(AuthContext);
+	const { username, signedIn } = useContext(AuthContext);
 
 	useEffect(() => {
 		axios
@@ -91,7 +91,7 @@ const CreatePost = (props) => {
 	) => {
 		axios
 			.put("http://localhost:8000/post", {
-                username: username,
+				username: username,
 				caption: caption,
 				picture_url: picture_url,
 				is_selling: +is_selling,
@@ -104,22 +104,23 @@ const CreatePost = (props) => {
 				color: color,
 			})
 			.then((response) => {
-                setCaption("");
-                setPictureUrl("");
-                setIsSelling(false);
-                setPrice("");
-                setSellingLink("");
-                setDate("");
-                setShoeBrand("");
-                setShoeModel("");
-                setShoeYear("");
-                setShoeColor("");
-                if(response.status === 200){
-                    alert("Post added successfully");
-                }
-            })
-            .catch((error) => {console.error("Error adding post to database:", error);});
-
+				setCaption("");
+				setPictureUrl("");
+				setIsSelling(false);
+				setPrice("");
+				setSellingLink("");
+				setDate("");
+				setShoeBrand("");
+				setShoeModel("");
+				setShoeYear("");
+				setShoeColor("");
+				if (response.status === 200) {
+					alert("Post added successfully");
+				}
+			})
+			.catch((error) => {
+				console.error("Error adding post to database:", error);
+			});
 	};
 
 	if (!signedIn) {
@@ -174,7 +175,13 @@ const CreatePost = (props) => {
 						freeSolo
 					/>
 				</FormControl>
-                <TextField label="Shoe Year" type="number" value={shoeYear} onChange={(e) => setShoeYear(e.target.value)} required />
+				<TextField
+					label="Shoe Year"
+					type="number"
+					value={shoeYear}
+					onChange={(e) => setShoeYear(e.target.value)}
+					required
+				/>
 				<FormControlLabel
 					control={<Checkbox checked={isSelling} onChange={(e) => setIsSelling(e.target.checked)} />}
 					label="Is Selling"

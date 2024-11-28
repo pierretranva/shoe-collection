@@ -14,22 +14,20 @@ import CreatePost from "./CreatePost";
 
 export default function App() {
 	return (
-			<AuthProvider>
-					<Navbar />
-					<Box>
-						<Routes>
-							<Route path="/" element={<UserPage/>} />
-							<Route path="/user" element={<UserPage />} />
-							<Route path="/admin" element={<AdminPage />} />
-							<Route path="/register" element={<RegisterAccount />} />
-							<Route path="/login" element={<Login />} />
-							<Route path="/create" element={<CreatePost />} />
-							<Route path="/profile/:profileUsername" element={<Profile />}
-							/>
-							<Route path="/profile" element={<Profile />} />
-						</Routes>
-					</Box>
-			</AuthProvider>
-
+		<AuthProvider>
+			<Navbar />
+			<Box>
+				<Routes>
+					<Route path="/" element={<UserPage />} />
+					<Route path="/user" element={<UserPage />} />
+					<Route path="/admin" element={<AdminPage />} />
+					<Route path="/register" element={<RegisterAccount />} />
+					<Route path="/login" element={<Login />} />
+					<Route path="/create" element={<CreatePost />} />
+					<Route path="/profile/:profileUsername" element={<Profile />} />
+					<Route path="/profile" element={<Profile />} />
+				</Routes>
+			</Box>
+		</AuthProvider>
 	);
 }
