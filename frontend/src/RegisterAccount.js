@@ -1,6 +1,7 @@
 import './RegisterAccount.css';
 import axios from "axios";
-import {useState} from "react";
+import {useState, useContext} from "react";
+import {AuthContext} from "./AuthContext";
 
 export default function RegisterAccount(props) {
     const [userUsername, setUserUsername] = useState("");
@@ -10,15 +11,16 @@ export default function RegisterAccount(props) {
     const [highlightRed, setHighlightRed] = useState({username: false, password: false, dob: false, hometown: false});
     const [registerErrorMessage, setRegisterErrorMessage] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
+    const {handleSignIn} = useContext(AuthContext);
 
 
 
     const handleRegisterUser = async () => {
-        console.log(typeof props.handleRegisterSuccess)
+        // console.log(typeof props.handleRegisterSuccess)
         try {
             setRegisterErrorMessage(false);
-            console.log(userUsername, userPassword, userDOB, userHometown)
-            console.log(typeof userUsername, typeof userPassword, typeof userDOB, typeof userHometown)
+            // console.log(userUsername, userPassword, userDOB, userHometown)
+            // console.log(typeof userUsername, typeof userPassword, typeof userDOB, typeof userHometown)
             const registerResponse = await axios.put('http://localhost:8000/add_users', {
                 "name": userUsername,
                 "password": userPassword,
@@ -26,7 +28,7 @@ export default function RegisterAccount(props) {
                 "hometown": userHometown
             });
 
-            console.log(registerResponse);
+            // console.log(registerResponse);
             if (registerResponse.status === 200) {
                 setRegisterErrorMessage(null);
                 setSuccessMessage("User successfully registered");
@@ -35,7 +37,7 @@ export default function RegisterAccount(props) {
                 setUserDOB("");
                 setUserHometown("");
                 // OnRegisterSuccess(registerResponse.data); /##NEED TO PASS USER OBJECT ON REGISTER
-                props.handleRegisterSuccess(userUsername);
+                handleSignIn(userUsername, registerResponse.data.user_id);
             }
         } catch (error) {
             console.error('User Login error:', error);
@@ -62,7 +64,7 @@ export default function RegisterAccount(props) {
 
     return (
         <div className="App">
-            <header className="App-header">
+            <div className="App-header">
                         <h2>Register New User Account</h2>
                         <input
                             type="text"
@@ -124,7 +126,7 @@ export default function RegisterAccount(props) {
                         </button>
                         {registerErrorMessage && <p style={{color: 'red'}}>{registerErrorMessage}</p>}
                         {successMessage && <p style={{color: 'green'}}>{successMessage}</p>}
-            </header>
+            </div>
         </div>
     )
 }

@@ -1,12 +1,14 @@
-import { React, useState } from "react";
+import { React, useState , useContext} from "react";
 import axios from "axios";
 import { NavLink } from "react-router-dom";
 import "./Login.css"
+import { AuthContext } from "./AuthContext";
 const Login = (props) => {
 	const [userUsername, setUserUsername] = useState("");
 	const [userPassword, setUserPassword] = useState("");
 	const [userVerified, setUserVerified] = useState(false);
 	const [loginErrorMessage, setLoginErrorMessage] = useState(false);
+    const {handleSignIn, signedIn} = useContext(AuthContext)
 
     const handleUserLogin = async () => {
         try {
@@ -20,7 +22,7 @@ const Login = (props) => {
             if (verified) {
                 setLoginErrorMessage(false);
                 setUserVerified(true);
-                props.handleLogin(userUsername, loginResponse.data.user_id);
+                handleSignIn(userUsername, loginResponse.data.user_id);
             } else {
                 setLoginErrorMessage(true);
             }
@@ -31,7 +33,9 @@ const Login = (props) => {
     };
 
 	return (
-		<div className="login">
+        <div className="App">
+            <div className="App-header">
+            {signedIn ? <h1>Already Logged In</h1> :<>
 			<h2>User Login</h2>
 			<input
 				type="text"
@@ -66,7 +70,9 @@ const Login = (props) => {
 				<h1 style={{ color: "grey", fontSize: "15px" }}>Register Account</h1>
 			</NavLink>
 			{loginErrorMessage && <p style={{ color: "red" }}>Failed to Login</p>}
-		</div>
+            </>
+		}		</div>
+        </div>
 	);
 };
 
