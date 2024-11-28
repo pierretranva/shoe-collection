@@ -2,6 +2,7 @@ import './AdminPage.css';
 
 import axios from 'axios';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 
 export default function AdminPage() {
@@ -16,7 +17,7 @@ export default function AdminPage() {
   const operations = [
     {operation: 'Insert', attributes: ['User', 'Shoe']},
     {operation: 'Delete', attributes: ['User', 'Shoe', 'Post']},
-    {operation: 'Update', attributes: ['User', 'Shoe', 'Post']}
+    {operation: 'Update', attributes: ['User', 'Shoe', 'Post']},
   ];
 
   //Gets entries of the selectedAttribute
@@ -48,6 +49,9 @@ export default function AdminPage() {
   const [sellingLink, setSellingLink] = useState("");
   const [postDate, setPostDate] = useState("");
 
+  //Navigate for metrics page.
+  const navigate = useNavigate()
+
   //Handles the cases that an attribute was clicked or the cancel button was clicked
   const attributeClick = (attribute) => {
     setAttribute(attribute);
@@ -78,6 +82,10 @@ export default function AdminPage() {
     setPrice("");
     setSellingLink("");
     setPostDate("");
+  };
+
+  const metricClick = () => {
+    navigate('/metrics');
   };
 
   //Function to fetch entries from the selected attribute
@@ -142,7 +150,7 @@ export default function AdminPage() {
         user_id: parseInt(userID),
         name: String(name),
         date_of_birth: String(dateOfBirth),
-        hometown: String(hometown),
+        home_town: String(hometown),
       }
     } else if (selectedAttribute === "Shoe") {
       payload = {
@@ -198,7 +206,7 @@ export default function AdminPage() {
                 {selectedAttribute === "User" && (
                     <Table
                         title="User List"
-                        headers={["Id", "Name", "Date of Birth"]}
+                        headers={["Id", "Name", "Date of Birth",]}
                         items={entries}
                         renderRow={(user) => (
                             <tr key={user.user_id}>
@@ -212,7 +220,7 @@ export default function AdminPage() {
                 {selectedAttribute === "Shoe" && (
                     <Table
                         title="Shoe List"
-                        headers={["Id", "Brand", "Model", "Year", "Color"]}
+                        headers={["Id", "Brand", "Model", "Year", "Color",]}
                         items={entries}
                         renderRow={(shoe) => (
                             <tr key={shoe.shoe_id}>
@@ -221,6 +229,21 @@ export default function AdminPage() {
                                 <td>{shoe.model}</td>
                                 <td>{shoe.year}</td>
                                 <td>{shoe.color}</td>
+                            </tr>
+                        )}
+                    />
+                )}
+                {selectedAttribute === "Post" && (
+                    <Table
+                        title="Post List"
+                        headers={["Caption", "Is Selling", "Price", "Date",]}
+                        items={entries}
+                        renderRow={(post) => (
+                            <tr key={post.caption}>
+                                <td>{post.caption}</td>
+                                <td>{post.is_selling}</td>
+                                <td>{post.price}</td>
+                                <td>{post.date}</td>
                             </tr>
                         )}
                     />
@@ -269,7 +292,7 @@ export default function AdminPage() {
 
           <p>Name: <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" /></p>
           <p>Password: <input type="text" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" /></p>
-          <p>Date Of Birth: <input type="text" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} placeholder="Date Of Birth" /></p>
+          <p>Date Of Birth: <input type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} placeholder="Date Of Birth" /></p>
           <p>Hometown: <input type="text" value={hometown} onChange={(e) => setHometown(e.target.value)} placeholder="Hometown" /></p>
 
           <div className="button">
@@ -306,7 +329,7 @@ export default function AdminPage() {
 
           <p>ID Of User To Update: <input type="number" value={userID} onChange={(e) => setUserID(e.target.value)} placeholder="ID" /></p>
           <p>Name: <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" /></p>
-          <p>Date Of Birth: <input type="text" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} placeholder="Date Of Birth" /></p>
+          <p>Date Of Birth: <input type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} placeholder="Date Of Birth" /></p>
           <p>Hometown: <input type="text" value={hometown} onChange={(e) => setHometown(e.target.value)} placeholder="Hometown" /></p>
 
           <div className="button">
@@ -347,7 +370,7 @@ export default function AdminPage() {
           <p>Is Selling: <input type="number" value={isSelling} onChange={(e) => setIsSelling(e.target.value)} placeholder="Is Selling" /></p>
           <p>Price: <input type="number" step={0.1} value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Price" /></p>
           <p>Selling Link: <input type="text" value={sellingLink} onChange={(e) => setSellingLink(e.target.value)} placeholder="Selling Link" /></p>
-          <p>Post Date: <input type="text" value={postDate} onChange={(e) => setPostDate(e.target.value)} placeholder="Post Date" /></p>
+          <p>Post Date: <input type="date" value={postDate} onChange={(e) => setPostDate(e.target.value)} placeholder="Post Date" /></p>
 
           <div className="button">
             <button onClick={handleUpdate}>Submit</button>
@@ -396,6 +419,10 @@ export default function AdminPage() {
                                             {operation.operation}
                                         </button>
                                     ))}
+                                </div>
+                                <h2>Shoe Collection Metrics:</h2>
+                                <div className="button">
+                                  <button onClick={metricClick}>Metrics</button>
                                 </div>
                             </>
                         )}

@@ -11,6 +11,8 @@ const Profile = ({isSignedIn, currentUser, userId}) => {
     const [userPosts, setUserPosts] = useState([]);
     const [followers, setFollowers] = useState(0);
     const [following, setFollowing] = useState(0);
+    const [postsForSale, setPostsForSale] = useState(0);
+    const [favoriteBrand, setFavoriteBrand] = useState("No Posts");
     const [isFollowing, setIsFollowing] = useState(false);
 
     const navigate = useNavigate();
@@ -71,6 +73,12 @@ const Profile = ({isSignedIn, currentUser, userId}) => {
                                 .get(`http://localhost:8000/following/${encodeURIComponent(user_id)}`)
                                 .then((response) => setFollowing(response.data));
                             axios
+                                .get(`http://localhost:8000/get_for_sale_posts/${encodeURIComponent(user_id)}`)
+                                .then((response) => setPostsForSale(response.data));
+                            axios
+                                .get(`http://localhost:8000/get_favorite_shoe_brand/${encodeURIComponent(user_id)}`)
+                                .then((response) => setFavoriteBrand(response.data));
+                            axios
                                 .get(`http://localhost:8000/is_following/${encodeURIComponent(userId)}/${encodeURIComponent(user_id)}`)
                                 .then((response) => setIsFollowing(response.data.status));
                         });
@@ -87,6 +95,12 @@ const Profile = ({isSignedIn, currentUser, userId}) => {
                 axios
                     .get(`http://localhost:8000/following/${encodeURIComponent(userId)}`)
                     .then((response) => setFollowing(response.data));
+                axios
+                    .get(`http://localhost:8000/get_for_sale_posts/${encodeURIComponent(userId)}`)
+                    .then((response) => setPostsForSale(response.data));
+                axios
+                    .get(`http://localhost:8000/get_favorite_shoe_brand/${encodeURIComponent(userId)}`)
+                    .then((response) => setFavoriteBrand(response.data));
             }
         }
 
@@ -120,8 +134,11 @@ const Profile = ({isSignedIn, currentUser, userId}) => {
             {/* Follower Stats */}
             <Box display="flex" justifyContent="space-between" marginBottom={2}>
                 <Typography>{userPosts.length} posts</Typography>
+                <Typography>{postsForSale} posts for sale</Typography>
                 <Typography>{followers} followers</Typography>
                 <Typography>{following} following</Typography>
+                <Typography>Favorite Shoe Brand: {favoriteBrand}</Typography>
+
             </Box>
 
 

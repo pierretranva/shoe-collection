@@ -12,11 +12,12 @@ def get_total_users():
     return total_users
 
 def get_total_posts():
-    with sqlite3.connect("database.db") as connection:
-        cursor = connection.cursor()
-        cursor.execute("SELECT COUNT(*) FROM Post")
-        total_posts = cursor.fetchone()[0]  
-        cursor.close()
+    connection = sqlite3.connect("database.db")
+    cursor = connection.cursor()
+    cursor.execute("SELECT COUNT(*) FROM Post")
+    total_posts = cursor.fetchone()[0]  
+    cursor.close()
+    connection.close()
     return total_posts
 
 def get_total_likes():
@@ -137,7 +138,7 @@ def get_favorite_shoe_brand(user_id):
     connection = sqlite3.connect("database.db")
     cursor = connection.cursor()
     cursor.execute("SELECT Shoe.* FROM Shoe JOIN Post ON Shoe.shoe_id = Post.related_shoe_id WHERE Post.creator_id = ?", (user_id))
-    brands = pd.Series([shoe[0] for shoe in cursor.fetchall()]) 
+    brands = pd.Series([shoe[1] for shoe in cursor.fetchall()]) 
     cursor.close()
     connection.close()
 

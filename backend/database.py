@@ -295,7 +295,6 @@ def add_shoe_to_database(brand, model, year, color):
         connection.commit()
         rowid = cursor.lastrowid
         cursor.close()
-        connection.close()
     return rowid
 
 
