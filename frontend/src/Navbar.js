@@ -1,4 +1,4 @@
-import * as React from 'react';
+import {React, useState, useContext} from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -13,10 +13,12 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import MergeIcon from '@mui/icons-material/Merge';
 import { NavLink } from 'react-router-dom';
+import {AuthContext} from './AuthContext';
 
-const Navbar = ({ username, signedIn, handleSignIn, handleLogout }) => {
-  const [anchorElNav, setAnchorElNav] = React.useState(null);
-  const [anchorElUser, setAnchorElUser] = React.useState(null);
+const Navbar = ({ username, handleSignIn, handleLogout }) => {
+  const [anchorElNav, setAnchorElNav] = useState(null);
+  const [anchorElUser, setAnchorElUser] = useState(null);
+  const {signedIn, user, handleSignOut} = useContext(AuthContext)
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -35,7 +37,7 @@ const Navbar = ({ username, signedIn, handleSignIn, handleLogout }) => {
   };
 
   const handleLogout1 = () => {
-    handleLogout();
+    handleSignOut();
     handleCloseUserMenu();
   };
   const handleProfileOrLogin = (setting)  => {
@@ -43,8 +45,7 @@ const Navbar = ({ username, signedIn, handleSignIn, handleLogout }) => {
       return "/login";
     }
     else if(setting === 'Profile') {
-        console.log(username)
-        return "/profile/"+username;
+        return "/profile";
     }
     else {
         return "/"+setting.toLowerCase();

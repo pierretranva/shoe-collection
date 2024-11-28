@@ -165,12 +165,12 @@ const PostCard = (props) => {
 							<List sx={{ paddingBottom: 0 }}>
 								{comment_count > 0 ? (
 									comments.map((comment, num) => (
-										<>
+										<div key={num}>
 											<Divider component="li" />
-											<ListItem key={num}>
+											<ListItem>
 												<ListItemText primary={comment.username} secondary={comment.text} />
 											</ListItem>
-										</>
+										</div>
 									))
 								) : (
 									<></>

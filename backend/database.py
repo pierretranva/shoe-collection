@@ -244,12 +244,55 @@ def get_post_by_id(post_id):
 
 
 def get_post_by_userId(user_id):
-    with sqlite3.connect('database.db') as connection:
+    with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
-        cursor.execute("SELECT * FROM Post WHERE creator_id = ?", (user_id,))
-        posts = [dict(post_id=row[0], caption=row[1], picture_url=row[2], is_selling=row[3], price=row[4],
-                      selling_link=row[5], date=row[6]) for row in cursor.fetchall()]
+        query = """
+        SELECT 
+            Post.post_id, 
+            Post.caption, 
+            Post.picture_url, 
+            Post.is_selling, 
+            Post.price, 
+            Post.selling_link, 
+            Post.date, 
+            User.username, 
+            Shoe.brand, 
+            Shoe.model, 
+            Shoe.year, 
+            Shoe.color, 
+            COUNT(DISTINCT Likes.likes_id) as like_count, 
+            COUNT(DISTINCT Comment.comment_id) as comment_count
+        FROM Post 
+        LEFT JOIN User on Post.creator_id = User.user_id
+        LEFT JOIN Shoe on Post.related_shoe_id = Shoe.shoe_id
+        LEFT JOIN Likes on Post.post_id = Likes.post_id
+        LEFT JOIN Comment on Post.post_id = Comment.post_id
+        WHERE Post.creator_id = ?
+        GROUP BY Post.post_id
+        ORDER BY Post.date DESC
+        """
+        cursor.execute(query, (user_id,))
+        posts = [
+            dict(
+                post_id=row[0],
+                caption=row[1],
+                picture_url=row[2],
+                is_selling=row[3],
+                price=row[4],
+                selling_link=row[5],
+                date=row[6],
+                creator=row[7],
+                brand=row[8],
+                model=row[9],
+                year=row[10],
+                color=row[11],
+                like_count=row[12],
+                comment_count=row[13],
+            )
+            for row in cursor.fetchall()
+        ]
         cursor.close()
+
     return posts
 
 

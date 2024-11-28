@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import {
 	TextField,
 	Checkbox,
@@ -11,7 +11,7 @@ import {
 	Autocomplete,
 } from "@mui/material";
 import axios from "axios";
-
+import { AuthContext } from "./AuthContext";
 const CreatePost = (props) => {
 	const [caption, setCaption] = useState("");
 	const [pictureUrl, setPictureUrl] = useState("");
@@ -27,6 +27,8 @@ const CreatePost = (props) => {
 	const [validShoeBrands, setValidShoeBrands] = useState([]);
 	const [validShoeModels, setValidShoeModels] = useState([]);
 	const [validShoeColors, setValidShoeColors] = useState([]);
+    const {username, signedIn} = useContext(AuthContext);
+
 	useEffect(() => {
 		axios
 			.get("http://localhost:8000/shoe/brands")
@@ -89,7 +91,7 @@ const CreatePost = (props) => {
 	) => {
 		axios
 			.put("http://localhost:8000/post", {
-                username: props.username,
+                username: username,
 				caption: caption,
 				picture_url: picture_url,
 				is_selling: +is_selling,
@@ -101,7 +103,7 @@ const CreatePost = (props) => {
 				year: year,
 				color: color,
 			})
-			.then((response) => {console.log(response.data)
+			.then((response) => {
                 setCaption("");
                 setPictureUrl("");
                 setIsSelling(false);
@@ -120,7 +122,7 @@ const CreatePost = (props) => {
 
 	};
 
-	if (!props.isSignedIn) {
+	if (!signedIn) {
 		return (
 			<Container maxWidth="sm">
 				<Typography variant="h4" component="h1" gutterBottom align="center" sx={{ paddingTop: 2 }}>

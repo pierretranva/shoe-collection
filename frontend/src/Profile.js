@@ -1,13 +1,14 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useContext, useRef} from 'react';
 import {Avatar, Box, Typography, Button, Stack, IconButton, TextField} from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import {useNavigate, useParams} from 'react-router-dom';
 import axios from "axios";
 import ScrollingList from "./ScrollingList";
+import {AuthContext} from './AuthContext';
 
-const Profile = ({isSignedIn, currentUser, userId}) => {
-    const {username} = useParams();
-
+const Profile = () => {
+    const {profileUsername} = useParams();
+    console.log("Profile", profileUsername);
     const [userPosts, setUserPosts] = useState([]);
     const [followers, setFollowers] = useState(0);
     const [following, setFollowing] = useState(0);
@@ -17,6 +18,7 @@ const Profile = ({isSignedIn, currentUser, userId}) => {
     const [password, setPassword] = useState("");
     const [date, setDate] = useState("");
     const [hometown, setHometown] = useState("");
+    const {username, userId, signedIn} = useContext(AuthContext);
 
     const navigate = useNavigate();
 
@@ -42,12 +44,12 @@ const Profile = ({isSignedIn, currentUser, userId}) => {
 
     const handleUnfollowClick = () => {
         axios
-            .get(`http://localhost:8000/users/name/${encodeURIComponent(username)}`)
+            .get(`http://localhost:8000/users/name/${encodeURIComponent(profileUsername)}`)
             .then((response) => {
-                const user_id = response.data[0]["user_id"];
+                const profile_user_id = response.data[0]["user_id"];
 
                 axios
-                    .get(`http://localhost:8000/unfollow/${encodeURIComponent(userId)}/${encodeURIComponent(user_id)}`)
+                    .get(`http://localhost:8000/unfollow/${encodeURIComponent(userId)}/${encodeURIComponent(profile_user_id)}`)
                     .then((response) => {
                         setIsFollowing(false);
                         setFollowers(followers - 1);
@@ -58,12 +60,12 @@ const Profile = ({isSignedIn, currentUser, userId}) => {
 
     const handleFollowClick = () => {
         axios
-            .get(`http://localhost:8000/users/name/${encodeURIComponent(username)}`)
+            .get(`http://localhost:8000/users/name/${encodeURIComponent(profileUsername)}`)
             .then((response) => {
-                const user_id = response.data[0]["user_id"];
+                const profile_user_id = response.data[0]["user_id"];
 
                 axios
-                    .get(`http://localhost:8000/follow/${encodeURIComponent(user_id)}/${encodeURIComponent(userId)}`)
+                    .get(`http://localhost:8000/follow/${encodeURIComponent(profile_user_id)}/${encodeURIComponent(userId)}`)
                     .then((response) => {
                         setIsFollowing(true);
                         setFollowers(followers + 1);
@@ -76,50 +78,52 @@ const Profile = ({isSignedIn, currentUser, userId}) => {
     };
 
     useEffect(() => {
+
+        console.log("Profile useEffect", username, userId, signedIn);
+        // if(signedIn === false){
+        //     return;
+        // }
         setUserPosts([]);
-        if (userId) {
-            if (username) {
-                try {
-                    axios
-                        .get(`http://localhost:8000/users/name/${encodeURIComponent(username)}`)
-                        .then((response) => {
-                            const user_id = response.data[0]["user_id"];
+        if (signedIn && (profileUsername === username) || signedIn && !profileUsername) {
+            console.log(userId, username, signedIn)
 
-                            axios
-                                .get(`http://localhost:8000/posts/user_id/${encodeURIComponent(user_id)}`)
-                                .then((response) => setUserPosts(response.data));
-                            axios
-                                .get(`http://localhost:8000/followers/${encodeURIComponent(user_id)}`)
-                                .then((response) => setFollowers(response.data));
-                            axios
-                                .get(`http://localhost:8000/following/${encodeURIComponent(user_id)}`)
-                                .then((response) => setFollowing(response.data));
-                            axios
-                                .get(`http://localhost:8000/is_following/${encodeURIComponent(userId)}/${encodeURIComponent(user_id)}`)
-                                .then((response) => setIsFollowing(response.data.status));
-                        });
+            axios
+                .get(`http://localhost:8000/posts/user_id/${encodeURIComponent(userId)}`)
+                .then((response) => setUserPosts(response.data));
+            axios
+                .get(`http://localhost:8000/followers/${encodeURIComponent(userId)}`)
+                .then((response) => setFollowers(response.data));
+            axios
+                .get(`http://localhost:8000/following/${encodeURIComponent(userId)}`)
+                .then((response) => setFollowing(response.data));
 
-                } catch (error) {
-                }
-            } else if (currentUser) {
+        } 
+        else if (signedIn){
+            try {
                 axios
-                    .get(`http://localhost:8000/posts/user_id/${encodeURIComponent(userId)}`)
-                    .then((response) => setUserPosts(response.data));
-                axios
-                    .get(`http://localhost:8000/followers/${encodeURIComponent(userId)}`)
-                    .then((response) => setFollowers(response.data));
-                axios
-                    .get(`http://localhost:8000/following/${encodeURIComponent(userId)}`)
-                    .then((response) => setFollowing(response.data));
-                axios.get(`http://localhost:8000/users/${encodeURIComponent(userId)}`)
+                    .get(`http://localhost:8000/users/name/${encodeURIComponent(profileUsername)}`)
                     .then((response) => {
-                        setDate(response.data["date_of_birth"])
-                        setHometown(response.data["hometown"])
+                        const profile_user_id = response.data[0]["user_id"];
+
+                        axios
+                            .get(`http://localhost:8000/posts/user_id/${encodeURIComponent(profile_user_id)}`)
+                            .then((response) => setUserPosts(response.data));
+                        axios
+                            .get(`http://localhost:8000/followers/${encodeURIComponent(profile_user_id)}`)
+                            .then((response) => setFollowers(response.data));
+                        axios
+                            .get(`http://localhost:8000/following/${encodeURIComponent(profile_user_id)}`)
+                            .then((response) => setFollowing(response.data));
+                        axios
+                            .get(`http://localhost:8000/is_following/${encodeURIComponent(userId)}/${encodeURIComponent(profile_user_id)}`)
+                            .then((response) => setIsFollowing(response.data.status));
                     });
+
+            } catch (error) {
             }
         }
 
-    }, [username, userId]);
+    }, [userId]);
 
     if (isEditingProfile) {
         return (
@@ -130,7 +134,6 @@ const Profile = ({isSignedIn, currentUser, userId}) => {
                 <TextField
                     label="Date of Birth"
                     type="date"
-                    InputLabelProps={{shrink: true}}
                     fullWidth
                     margin="normal"
                     value={date}
@@ -155,9 +158,9 @@ const Profile = ({isSignedIn, currentUser, userId}) => {
                     sx={{width: 80, height: 80}}
                 />
                 <Box flex="1">
-                    <Typography variant="h6">{username}</Typography>
+                    <Typography variant="h6">{profileUsername ? profileUsername : username}</Typography>
                     <Stack direction="row" spacing={2} mt={1}>
-                        {(isSignedIn && (!username || currentUser === username)) ?
+                        {(signedIn && (!profileUsername || profileUsername === username)) ?
                             <Button variant="outlined" onClick={handleEditProfileClick}>Edit Profile</Button> :
                             (isFollowing ?
                                 <Button variant="outlined" onClick={handleUnfollowClick}>Unfollow</Button> :
