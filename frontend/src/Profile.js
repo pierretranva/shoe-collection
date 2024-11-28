@@ -177,7 +177,7 @@ const Profile = ({isSignedIn, currentUser, userId}) => {
             </Box>
 
             {/* Posts Grid */}
-            {ScrollingList(userPosts)}
+            {ScrollingList(userPosts, userId)}
         </Box>
     );
 };

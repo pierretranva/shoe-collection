@@ -42,7 +42,13 @@ const Navbar = ({ username, signedIn, handleSignIn, handleLogout }) => {
     if (setting === 'Logout') {
       return "/login";
     }
-    else {}
+    else if(setting === 'Profile') {
+        console.log(username)
+        return "/profile/"+username;
+    }
+    else {
+        return "/"+setting.toLowerCase();
+    }
 
   }
 
@@ -166,7 +172,7 @@ const Navbar = ({ username, signedIn, handleSignIn, handleLogout }) => {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting, i) => (
-                <NavLink key={i} to={setting === 'Logout' ? '/login' : `/${setting.toLowerCase()+ "/username"}`} style={{ textDecoration: 'none' }}>
+                <NavLink key={i} to={handleProfileOrLogin(setting)} style={{ textDecoration: 'none' }}>
                   <MenuItem key={setting} onClick={setting === 'Logout' ? handleLogout1 : handleCloseUserMenu}>
                     <Typography textAlign="center">{setting}</Typography>
                   </MenuItem>

@@ -8,7 +8,8 @@ from database import (
     get_all_shoes, get_shoe_by_id, delete_shoe_by_id, update_shoe_by_id, add_shoe_to_database,
     get_post_by_userId, number_of_followers, number_of_following, follow, unfollow, is_following,
     verify_admin, verify_user, get_all_shoe_brands, get_all_shoe_models, get_all_shoe_colors, add_post_to_database,
-    get_shoe_id, user_liked_post, edit_user_profile_by_id
+    get_shoe_id, user_liked_post, edit_user_profile_by_id, db_like_post, db_unlike_post, get_if_user_likes_post, get_post_comments,
+    add_comment_to_post
 )
 from database_metrics import (
     get_total_users, get_total_posts, get_total_likes, get_total_comments, get_sum_price, get_oldest_user,
@@ -89,6 +90,16 @@ class AddPostPayload(BaseModel):
     model: str
     year: int
     color: str
+
+class LikePostPayload(BaseModel):
+    post_id: int
+    user_id: int
+
+class CommentPostPayload(BaseModel):
+    post_id: int
+    user_id: int
+    text: str
+    date: str
 
 
 @app.get("/health")
@@ -189,9 +200,9 @@ def edit_profile(payload: EditProfileUserPayload):
 def add_user(payload: CreateUserPayload):
     if len(get_user_by_name(payload.name)) > 0:
         raise HTTPException(status_code=404, detail='Username already exists')
-    updated = add_user_to_database(payload.name, payload.password, payload.date_of_birth, payload.hometown)
+    updated, user_id = add_user_to_database(payload.name, payload.password, payload.date_of_birth, payload.hometown)
     if updated:
-        return {'message': 'User created successfully', 'username': payload.name}
+        return {'message': 'User created successfully', 'username': payload.name, 'user_id': user_id}
     else:
         raise HTTPException(status_code=404, detail='User not created')
 
@@ -358,6 +369,19 @@ def total_comments():
     else:
         return 0
     
+@app.get('/comments/{post_id}')
+def get_all_comments_from_post(post_id: int):
+    metrics = get_post_comments(post_id)
+    if metrics:
+        return metrics
+    else:
+        return []
+
+@app.post('/comments')
+def add_comment(payload: CommentPostPayload):
+    add_comment_to_post(payload.post_id, payload.user_id, payload.text, payload.date)
+    return {'status': 'ok'}
+
 @app.get('/get_sum_price')
 def sum_price():
     metric = get_sum_price()
@@ -445,6 +469,19 @@ def favorite_shoe_brand(user_id):
         return metric
     else:
         raise HTTPException(status_code=404, detail='Metric Created Unsuccessfully')
+
+@app.post('/like_post')
+def like_post(payload: LikePostPayload):
+    db_like_post(payload.post_id, payload.user_id)
+    return {'status': 'ok'}
+
+@app.post('/unlike_post')
+def unlike_post(payload: LikePostPayload):
+    db_unlike_post(payload.post_id, payload.user_id)
+    return {'status': 'ok'}
+@app.get('/check_like')
+def check_if_liked(post_id: int, user_id: int):
+    return {"status": get_if_user_likes_post(user_id, post_id)}
 
 
 if __name__ == "__main__":

@@ -35,7 +35,7 @@ export default function RegisterAccount(props) {
                 setUserDOB("");
                 setUserHometown("");
                 // OnRegisterSuccess(registerResponse.data); /##NEED TO PASS USER OBJECT ON REGISTER
-                props.handleRegisterSuccess(userUsername);
+                props.handleRegisterSuccess(userUsername, registerResponse.data.user_id);
             }
         } catch (error) {
             console.error('User Login error:', error);

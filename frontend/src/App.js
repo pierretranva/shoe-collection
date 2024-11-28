@@ -22,12 +22,14 @@ export default function App() {
 
     //check to see if user login info is stored in local storage
 	useEffect(() => {
+        console.log(Object.keys(localStorage))
 		if (Object.keys(localStorage).includes("username")) {
 			setSignedIn(true);
 			setUser(JSON.parse(localStorage.getItem("username")));
 			setUserId(JSON.parse(localStorage.getItem("user_id")));
+            console.log("did it set")
 		}
-	}, []);
+	},[]);
 
     const handleSignIn = (currentUser, user_id) => {
         setSignedIn(true);
@@ -43,10 +45,11 @@ export default function App() {
         setUser(null);
         localStorage.clear();
     }
-    const handleRegisterSuccess = (currentUser) =>{
+    const handleRegisterSuccess = (currentUser, userId) =>{
         setUser(currentUser);
         setSignedIn(true);
         localStorage.setItem("username", JSON.stringify(currentUser));
+        localStorage.setItem("user_id", JSON.stringify(userId));
         navigate("/user");
     }
 
@@ -57,7 +60,7 @@ export default function App() {
 
         <Routes>
             <Route path="/" element={<UserPage isSignedIn={signedIn} username={user}/>}/>
-            <Route path="/user" element={<UserPage isSignedIn={signedIn} username={user}/>}/>
+            <Route path="/user" element={<UserPage isSignedIn={signedIn} username={user} userId={userId}/>}/>
             <Route path="/admin" element={<AdminPage/>}/>
             <Route path="/register" element={<RegisterAccount handleRegisterSuccess={handleRegisterSuccess}/>}/>
             <Route path="/login" element={<Login handleLogin={handleSignIn}/>}/>
