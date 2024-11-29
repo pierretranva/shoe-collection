@@ -89,6 +89,7 @@ const CreatePost = (props) => {
 		year,
 		color
 	) => {
+        console.log(shoeBrand)
 		axios
 			.put("http://localhost:8000/post", {
 				username: username,
@@ -145,7 +146,11 @@ const CreatePost = (props) => {
 						getOptionLabel={(option) => option}
 						renderInput={(params) => <TextField {...params} label="Shoe Brand" />}
 						value={shoeBrand}
+                        onKeyUp={(event)=>{
+                            setShoeBrand(event.target.value);
+                        }}
 						onChange={(event, newValue) => {
+
 							setShoeBrand(newValue);
 						}}
 						freeSolo
@@ -157,7 +162,12 @@ const CreatePost = (props) => {
 						getOptionLabel={(option) => option}
 						renderInput={(params) => <TextField {...params} label="Shoe Model" />}
 						value={shoeModel}
+                        onKeyUp={(event) =>{
+							setShoeModel(event.target.value);
+
+                        }}
 						onChange={(event, newValue) => {
+                            
 							setShoeModel(newValue);
 						}}
 						freeSolo
@@ -169,6 +179,9 @@ const CreatePost = (props) => {
 						getOptionLabel={(option) => option}
 						renderInput={(params) => <TextField {...params} label="Shoe Color" />}
 						value={shoeColor}
+                        onKeyUp={(event) =>{
+                            setShoeColor(event.target.value);
+                        }}
 						onChange={(event, newValue) => {
 							setShoeColor(newValue);
 						}}

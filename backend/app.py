@@ -587,7 +587,6 @@ def check_if_liked(post_id: int, user_id: int):
 
 @app.get("/search")
 def search(searchType: str, query: str):
-    print("HERERERE",query)
     if searchType == 'user':
         users = search_for_users(query)
         return users
