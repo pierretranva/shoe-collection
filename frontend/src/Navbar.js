@@ -53,7 +53,7 @@ const Navbar = ({ username, handleSignIn, handleLogout }) => {
 	const pages = [
 		{ name: "User", link: "/" },
 		{ name: "Admin", link: "/admin" },
-		{ name: "Search", link: "/map" },
+		{ name: "Search", link: "/search" },
 		{ name: "Create Post", link: "/create" },
 	];
 	const settings = signedIn ? ["Profile", "Logout"] : ["Login", "Register"];

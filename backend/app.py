@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
+
 from database import (
     get_all_users,
     get_user_by_id,
@@ -38,6 +39,9 @@ from database import (
     get_if_user_likes_post,
     get_post_comments,
     add_comment_to_post,
+    search_for_users,
+    search_for_posts,
+    search_for_shoe_posts
 )
 from database_metrics import (
     get_total_users,
@@ -581,6 +585,20 @@ def unlike_post(payload: LikePostPayload):
 def check_if_liked(post_id: int, user_id: int):
     return {"status": get_if_user_likes_post(user_id, post_id)}
 
+@app.get("/search")
+def search(searchType: str, query: str):
+    print("HERERERE",query)
+    if searchType == 'user':
+        users = search_for_users(query)
+        return users
+    elif searchType == 'post':
+        posts = search_for_posts(query)
+        return posts
+    elif searchType == 'shoe':
+        posts = search_for_shoe_posts(query)
+        return posts
+
+    raise HTTPException(status_code=400, detail="Bad Search Request")
 
 if __name__ == "__main__":
     uvicorn.run("app:app", host="127.0.0.1", port=8000, reload=False)

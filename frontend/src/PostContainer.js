@@ -26,6 +26,7 @@ import CommentIcon from "@mui/icons-material/Comment";
 import SendIcon from "@mui/icons-material/Send";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const PostCard = (props) => {
 	let {
@@ -52,6 +53,7 @@ const PostCard = (props) => {
 	const [pictureUrl, setPictureUrl] = useState(picture_url);
 	const [commentText, setCommentText] = useState("");
 	const [comments, setComments] = useState([]);
+    const navigate = useNavigate();
 
 	useEffect(() => {
 		let randomImage = [
@@ -120,6 +122,7 @@ const PostCard = (props) => {
 	};
 	const handleGetComments = () => {
 		axios.get("http://localhost:8000/comments/" + post_id).then((response) => {
+            console.log(response.data)
 			setComments(response.data);
 			setCommentCount(response.data.length);
 		});
@@ -133,9 +136,9 @@ const PostCard = (props) => {
 			{/* Header */}
 			<CardHeader
 				avatar={<Avatar></Avatar>}
-				title={creator}
-				subheader={date}
-				titleTypographyProps={{ variant: "h5" }}
+				title={<Typography onClick={() =>{navigate('/profile/'+creator)}}variant="h5">{creator}</Typography>}
+				subheader={<Typography variant="body2">{brand + " " + model + " " + year + " " + color+ " " + date}</Typography>}
+                disableTypography={true}
 			/>
 
 			{/* Image */}
@@ -156,6 +159,15 @@ const PostCard = (props) => {
 				<Typography variant="body2" color="text.secondary">
 					{" " + caption}
 				</Typography>
+                <>
+                    {is_selling ? (
+                        <Typography variant="body2" color="text.secondary">
+                            Selling:<a href={selling_link}>Click this link to buy!</a>
+                            </Typography>) : (<> </>)}
+                </>
+             
+                    
+
 				<Box sx={{ alignItems: "left", display: "flex", flexDirection: "column" }}>
 					<Accordion onChange={handleGetComments} sx={{ marginTop: 1, marginBottom: 1 }}>
 						<AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1-content" id="panel1-header">
@@ -163,7 +175,7 @@ const PostCard = (props) => {
 						</AccordionSummary>
 						<AccordionDetails sx={{ padding: "0" }}>
 							<List sx={{ paddingBottom: 0 }}>
-								{comment_count > 0 ? (
+								{commentCount > 0 ? (
 									comments.map((comment, num) => (
 										<div key={num}>
 											<Divider component="li" />

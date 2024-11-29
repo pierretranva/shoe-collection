@@ -622,3 +622,122 @@ def get_if_user_likes_post(user_id, post_id):
     if rows:
         return True
     return False
+
+def search_for_users(query):
+    with sqlite3.connect("database.db") as connection:
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM User WHERE username LIKE ?", (f"%{query}%",))
+        users = [
+            dict(user_id=row[0], name=row[1], date_of_birth=row[3])
+            for row in cursor.fetchall()
+        ]
+        cursor.close()
+    return users
+def search_for_posts(search_query):
+    print(search_query)
+
+    with sqlite3.connect("database.db") as connection:
+        cursor = connection.cursor()
+        query = """
+        SELECT 
+            Post.post_id, 
+            Post.caption, 
+            Post.picture_url, 
+            Post.is_selling, 
+            Post.price, 
+            Post.selling_link, 
+            Post.date, 
+            User.username, 
+            Shoe.brand, 
+            Shoe.model, 
+            Shoe.year, 
+            Shoe.color, 
+            COUNT(DISTINCT Likes.likes_id) as like_count, 
+            COUNT(DISTINCT Comment.comment_id) as comment_count
+        FROM Post
+        LEFT JOIN User on Post.creator_id = User.user_id
+        LEFT JOIN Shoe on Post.related_shoe_id = Shoe.shoe_id
+        LEFT JOIN Likes on Post.post_id = Likes.post_id
+        LEFT JOIN Comment on Post.post_id = Comment.post_id
+        WHERE Post.caption LIKE ?
+        GROUP BY Post.post_id
+        ORDER BY Post.date DESC
+        LIMIT 10
+        """
+        cursor.execute(query, ( (f"%{search_query}%",)))
+        posts = [
+            dict(
+                post_id=row[0],
+                caption=row[1],
+                picture_url=row[2],
+                is_selling=row[3],
+                price=row[4],
+                selling_link=row[5],
+                date=row[6],
+                creator=row[7],
+                brand=row[8],
+                model=row[9],
+                year=row[10],
+                color=row[11],
+                like_count=row[12],
+                comment_count=row[13],
+            )
+            for row in cursor.fetchall()
+        ]
+        cursor.close()
+
+    return posts
+
+def search_for_shoe_posts(search_query):
+    print(search_query)
+    with sqlite3.connect("database.db") as connection:
+        cursor = connection.cursor()
+        query = """
+        SELECT 
+            Post.post_id, 
+            Post.caption, 
+            Post.picture_url, 
+            Post.is_selling, 
+            Post.price, 
+            Post.selling_link, 
+            Post.date, 
+            User.username, 
+            Shoe.brand, 
+            Shoe.model, 
+            Shoe.year, 
+            Shoe.color, 
+            COUNT(DISTINCT Likes.likes_id) as like_count, 
+            COUNT(DISTINCT Comment.comment_id) as comment_count
+        FROM Post
+        LEFT JOIN User on Post.creator_id = User.user_id
+        LEFT JOIN Shoe on Post.related_shoe_id = Shoe.shoe_id
+        LEFT JOIN Likes on Post.post_id = Likes.post_id
+        LEFT JOIN Comment on Post.post_id = Comment.post_id
+        WHERE Shoe.brand LIKE ? OR Shoe.model LIKE ? OR Shoe.year LIKE ? OR Shoe.color LIKE ?
+        GROUP BY Post.post_id
+        ORDER BY Post.date DESC
+        LIMIT 10
+        """
+        cursor.execute(query, ( (f"%{search_query}%",)))
+        posts = [
+            dict(
+                post_id=row[0],
+                caption=row[1],
+                picture_url=row[2],
+                is_selling=row[3],
+                price=row[4],
+                selling_link=row[5],
+                date=row[6],
+                creator=row[7],
+                brand=row[8],
+                model=row[9],
+                year=row[10],
+                color=row[11],
+                like_count=row[12],
+                comment_count=row[13],
+            )
+            for row in cursor.fetchall()
+        ]
+        cursor.close()
+
+    return posts

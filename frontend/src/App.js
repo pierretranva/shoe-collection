@@ -12,6 +12,7 @@ import Login from "./Login";
 import Profile from "./Profile";
 import CreatePost from "./CreatePost";
 import Metrics from "./Metrics";
+import Search from "./Search";
 
 export default function App() {
 	return (
@@ -28,6 +29,7 @@ export default function App() {
 					<Route path="/profile/:profileUsername" element={<Profile />} />
 					<Route path="/profile" element={<Profile />} />
 					<Route path="/metrics" element={<Metrics />} />
+                    <Route path="/search" element={<Search/>}/>
 				</Routes>
 			</Box>
 		</AuthProvider>
