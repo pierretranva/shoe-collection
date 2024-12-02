@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { TextField, Button, Typography, Box, IconButton, Checkbox, FormControlLabel } from '@mui/material';
+import { FormControlLabel, Checkbox, TextField, Button, Typography, Box, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import HomeIcon from "@mui/icons-material/Home";
 import { useNavigate } from "react-router-dom";
 
@@ -30,6 +30,10 @@ export default function EditPost() {
             console.error(`Failed to fetch post entries.`);
         }
     };
+
+    useEffect(() => {
+        fetchEntries();
+    }, []);
 
     const getPayload = async () => {
         let payload = null;
@@ -141,6 +145,37 @@ export default function EditPost() {
                     Edit Post
                 </Button>
             </Box>
+
+            <TableContainer component={Paper} sx={{ width:"60%", margin:"0 auto", marginTop: 4, boxShadow: 3 }}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell sx={{ fontWeight:"bold" }}>Post ID</TableCell>
+                            <TableCell sx={{ fontWeight:"bold" }}>Caption</TableCell>
+                            <TableCell sx={{ fontWeight:"bold" }}>Is Selling</TableCell>
+                            <TableCell sx={{ fontWeight:"bold" }}>Price</TableCell>
+                            <TableCell sx={{ fontWeight:"bold" }}>Date</TableCell>
+                            <TableCell sx={{ fontWeight:"bold" }}>Creator</TableCell>
+                            <TableCell sx={{ fontWeight:"bold" }}>Like Count</TableCell>
+                            <TableCell sx={{ fontWeight:"bold" }}>Comment Count</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {entries.map((entry) => (
+                            <TableRow key={entry.post_id}>
+                                <TableCell>{entry.post_id}</TableCell>
+                                <TableCell>{entry.caption}</TableCell>
+                                <TableCell>{entry.is_selling}</TableCell>
+                                <TableCell>{entry.price}</TableCell>
+                                <TableCell>{entry.date}</TableCell>
+                                <TableCell>{entry.creator}</TableCell>
+                                <TableCell>{entry.like_count}</TableCell>
+                                <TableCell>{entry.comment_count}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
         </Box>
     );
 };

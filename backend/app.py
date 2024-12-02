@@ -202,6 +202,7 @@ def update_admin(payload: UpdateAdminPayload):
 @app.get("/users")
 def get_users():
     users = get_all_users()
+    print(users)
     return users
 
 @app.get("/users/{user_id}")

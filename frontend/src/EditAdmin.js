@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { TextField, Button, Typography, Box, IconButton } from '@mui/material';
+import { TextField, Button, Typography, Box, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import HomeIcon from "@mui/icons-material/Home";
 import { useNavigate } from "react-router-dom";
 
@@ -26,6 +26,10 @@ export default function EditAdmin() {
             console.error(`Failed to fetch admin entries.`);
         }
     };
+
+    useEffect(() => {
+        fetchEntries();
+    }, []);
 
     const getPayload = async () => {
         let payload = null;
@@ -94,6 +98,25 @@ export default function EditAdmin() {
                     Edit Admin
                 </Button>
             </Box>
+
+            <TableContainer component={Paper} sx={{ width:"50%", margin:"0 auto", marginTop: 4, boxShadow: 3 }}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell sx={{ fontWeight:"bold" }}>Admin ID</TableCell>
+                            <TableCell sx={{ fontWeight:"bold" }}>Name</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {entries.map((entry) => (
+                            <TableRow key={entry.admin_id}>
+                                <TableCell>{entry.admin_id}</TableCell>
+                                <TableCell>{entry.name}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
         </Box>
     );
 };

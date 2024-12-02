@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { TextField, Button, Typography, Box, IconButton } from '@mui/material';
+import { TextField, Button, Typography, Box, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import HomeIcon from "@mui/icons-material/Home";
 import { useNavigate } from "react-router-dom";
 
@@ -24,6 +24,10 @@ export default function RemoveShoe() {
             console.error(`Failed to fetch shoe entries.`);
         }
     };
+
+    useEffect(() => {
+        fetchEntries();
+    }, []);
 
     //Sets the payload.
     const getPayload = async () => {
@@ -66,6 +70,31 @@ export default function RemoveShoe() {
                     Remove Shoe
                 </Button>
             </Box>
+
+            <TableContainer component={Paper} sx={{ width:"50%", margin:"0 auto", marginTop: 4, boxShadow: 3 }}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell sx={{ fontWeight:"bold" }}>Shoe ID</TableCell>
+                            <TableCell sx={{ fontWeight:"bold" }}>Brand</TableCell>
+                            <TableCell sx={{ fontWeight:"bold" }}>Model</TableCell>
+                            <TableCell sx={{ fontWeight:"bold" }}>Year</TableCell>
+                            <TableCell sx={{ fontWeight:"bold" }}>Color</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {entries.map((entry) => (
+                            <TableRow key={entry.shoe_id}>
+                                <TableCell>{entry.shoe_id}</TableCell>
+                                <TableCell>{entry.brand}</TableCell>
+                                <TableCell>{entry.model}</TableCell>
+                                <TableCell>{entry.year}</TableCell>
+                                <TableCell>{entry.color}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
         </Box>
     );
 };

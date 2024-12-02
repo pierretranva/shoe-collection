@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { TextField, Button, Typography, Box, IconButton } from '@mui/material';
+import { TextField, Button, Typography, Box, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import HomeIcon from "@mui/icons-material/Home";
 import { useNavigate } from "react-router-dom";
 
@@ -27,6 +27,10 @@ export default function EditUser() {
             console.error(`Failed to fetch user entries.`);
         }
     };
+
+    useEffect(() => {
+        fetchEntries();
+    }, []);
 
     const getPayload = async () => {
         let payload = null;
@@ -108,6 +112,29 @@ export default function EditUser() {
                     Edit User
                 </Button>
             </Box>
+
+            <TableContainer component={Paper} sx={{ width:"50%", margin:"0 auto", marginTop: 4, boxShadow: 3 }}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell sx={{ fontWeight:"bold" }}>User ID</TableCell>
+                            <TableCell sx={{ fontWeight:"bold" }}>Name</TableCell>
+                            <TableCell sx={{ fontWeight:"bold" }}>Date of Birth</TableCell>
+                            <TableCell sx={{ fontWeight:"bold" }}>Hometown</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {entries.map((entry) => (
+                            <TableRow key={entry.user_id}>
+                                <TableCell>{entry.user_id}</TableCell>
+                                <TableCell>{entry.name}</TableCell>
+                                <TableCell>{entry.date_of_birth}</TableCell>
+                                <TableCell>{entry.hometown}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
         </Box>
     );
 };
