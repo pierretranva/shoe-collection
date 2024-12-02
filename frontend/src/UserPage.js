@@ -19,7 +19,7 @@ export default function UserPage(props) {
 		<>
 			{signedIn ? (
 				<Box sx={{ maxWidth: 600, margin: "auto", padding: 2 }}>
-					<h1>Welcome {username}</h1>
+					<h1>Welcome {username}!</h1>
 					{ScrollingList(posts, userId)}
 					<Pagination
 						count={10}
@@ -31,7 +31,7 @@ export default function UserPage(props) {
 				</Box>
 			) : (
 				<Box sx={{ maxWidth: 600, margin: "auto", padding: 2 }}>
-					<h1>Welcome Guest</h1>
+					<h1>Welcome Guest!</h1>
 					<NavLink to="/login" style={{}}>
 						<h1 style={{ color: "grey", fontSize: "15px" }}>Login to Access all Features</h1>
 					</NavLink>

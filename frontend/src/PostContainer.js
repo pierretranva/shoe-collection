@@ -161,7 +161,7 @@ const PostCard = (props) => {
                 <>
                     {is_selling ? (
                         <Typography variant="body2" color="text.secondary">
-                            Selling:<a href={selling_link}>Click this link to buy!</a>
+                            Selling: <a href={selling_link}>Click this link to buy!</a>
                             </Typography>) : (<> </>)}
                 </>
              

@@ -2,22 +2,24 @@ import { Card, CardContent, Typography, Grid2, Box, IconButton } from '@mui/mate
 import HomeIcon from "@mui/icons-material/Home";
 import { useNavigate } from "react-router-dom";
 
-export default function AdminPage() {
-	const navigate = useNavigate();
-
-    const cards = [
-        {title: 'Create', description: 'Insert new users, shoes, and admins into the database.'},
-        {title: 'Remove', description: 'Delete inappropriate users, shoes, posts, and admins from the database.'},
-        {title: 'Edit', description: 'Update old users, posts, and admins currently in the database.'},
-        {title: 'Metrics', description: 'View overall and admin specific metrics about the database.'}
-    ]
-
-	const handleHomeClick = () => {
-		navigate("/adminlogin");
+export default function Edit() {
+	//Home button.
+    const navigate = useNavigate();
+    const handleHomeClick = () => {
+		navigate("/admin");
 	};
 
+    //Card types for edit.
+    const cards = [
+        {title: 'User', description: 'Edit a user account already in Shoe Collection.'},
+        {title: 'Shoe', description: 'Edit a shoe already in Shoe Collection.'},
+        {title: 'Post', description: 'Edit a post already in Shoe Collection.'},
+        {title: 'Admin', description: 'Edit and change the password of an admin already in Shoe Collection.'},
+    ]
+
+    //Handles different edits based on the card type.
     const handleCardClick = (card_type) => {
-        navigate(`/admin${card_type.toLowerCase()}`);
+        navigate(`/edit${card_type.toLowerCase()}`);
     }
 
     const renderCards = (cards) => (
@@ -43,7 +45,7 @@ export default function AdminPage() {
         <Box sx={{ padding: 4, backgroundColor: '#f5f5f5' ,minHeight: '100vh' }}>
             <Box display="flex" justifyContent="center" alignItems="center" position="relative" mb={4}>
                 <Typography variant="h4" fontWeight="bold" textAlign="center" sx={{ width: '100%' }}>
-                    Admin Development
+                    Edit Menu
                 </Typography>
 
                 <IconButton onClick={handleHomeClick} sx={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)' }}>

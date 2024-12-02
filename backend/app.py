@@ -3,7 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
 from database import (
+    add_admin_to_database,
     get_all_users,
+    get_all_admins,
+    delete_admin_by_id,
+    update_admin_by_id,
     get_user_by_id,
     get_user_by_name,
     delete_user_by_id,
@@ -71,7 +75,7 @@ app.add_middleware(
 )
 
 
-#Basic classes to change different database object.
+#Basic payloads to change different database object.
 class UpdateUserPayload(BaseModel):
     user_id: int
     name: str
@@ -89,6 +93,15 @@ class CreateUserPayload(BaseModel):
     password: str
     date_of_birth: str
     hometown: str
+
+class CreateAdminPayload(BaseModel):
+    name: str
+    password: str
+
+class UpdateAdminPayload(BaseModel):
+    admin_id : int
+    name: str
+    password: str
 
 class UpdatePostPayload(BaseModel):
     post_id: int
@@ -154,6 +167,36 @@ def login_user(payload: LoginPayload):
     status, user_id = verify_user(payload.username, payload.password)
     return {"status": status, "user_id": user_id}
 
+#Admin based endpoints.
+@app.get("/admins")
+def get_admins():
+    admins = get_all_admins()
+    return admins
+
+@app.put("/add_admins")
+def add_user(payload: CreateAdminPayload):
+    updated = add_admin_to_database(payload.name, payload.password)
+    if updated:
+        return {"message": "Shoe created successfully"}
+    else:
+        raise HTTPException(status_code=404, detail="Shoe not created")
+
+@app.delete("/admins/{admin_id}")
+def delete_admin(admin_id: int):
+    deleted = delete_admin_by_id(admin_id)
+    if deleted:
+        return {"message": "User deleted successfully"}
+    else:
+        raise HTTPException(status_code=404, detail="User not found")
+
+@app.put("/update_admins")
+def update_admin(payload: UpdateAdminPayload):
+    updated = update_admin_by_id(
+        payload.admin_id, payload.name, payload.password)
+    if updated:
+        return {"message": "User updated successfully"}
+    else:
+        raise HTTPException(status_code=404, detail="User not found")
 
 #User based endpoints.
 @app.get("/users")

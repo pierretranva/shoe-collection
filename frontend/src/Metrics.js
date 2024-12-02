@@ -3,7 +3,6 @@ import { Card, CardContent, Typography, Grid2, Box, IconButton } from '@mui/mate
 import HomeIcon from "@mui/icons-material/Home";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import './Metrics.css'
 
 export default function Metrics() {
     const [totalUsers, setTotalUsers] = useState(0);
@@ -76,7 +75,7 @@ export default function Metrics() {
         <Grid2 container spacing={4} justifyContent="center">
             {metric_type.map((metric, index) => (
                 <Grid2 item xs={12} sm={6} md={4} key={index}>
-                    <Card sx={{ boxShadow: 3, padding: 2, textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                    <Card sx={{ height:"150px", width:"300px", overflow:"hidden", wordWrap:"break-word", boxShadow: 3, padding: 1, textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
                         <CardContent>
                             <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'darkgray', marginBottom: 0, fontSize: '1.5rem' }}>
                                 {metric.description}
@@ -96,11 +95,11 @@ export default function Metrics() {
 
     return (
         <Box sx={{ padding: 4, backgroundColor: '#f5f5f5' }}>
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
+            <Box display="flex" justifyContent="space-between" alignItems="center" position="relative" mb={4}>
                 <Typography variant="h4" fontWeight="bold" textAlign="center" sx={{ width: '100%' }}>
                     Overall Metrics
                 </Typography>
-                <IconButton onClick={handleHomeClick}>
+                <IconButton onClick={handleHomeClick} sx={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)' }}>
                     <HomeIcon sx={{ color: 'darkgray' }} />
                 </IconButton>
             </Box>

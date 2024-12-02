@@ -79,13 +79,59 @@ except:
     create_admin("admin", "password")
 
 
+#Admin Specific Functions.
+def get_all_admins():
+    with sqlite3.connect("database.db") as connection:
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM Admin")
+        admins = [
+            dict(admin_id=row[0], name=row[1])
+            for row in cursor.fetchall()
+        ]
+        cursor.close()
+    return admins
+
+def add_admin_to_database(username, password):
+    with sqlite3.connect("database.db") as connection:
+        cursor = connection.cursor()
+        password = hash_password(password)
+        cursor.execute(
+            "INSERT INTO Admin (username, password) VALUES (?, ?)", (username, password)
+        )
+        connection.commit()
+        rowid = cursor.lastrowid
+        cursor.close()
+    return rowid
+
+def delete_admin_by_id(admin_id):
+    with sqlite3.connect("database.db") as connection:
+        cursor = connection.cursor()
+        cursor.execute("DELETE FROM Admin WHERE admin_id = ?", (admin_id,))
+        connection.commit()
+        deleted = cursor.rowcount > 0
+        cursor.close()
+    return deleted
+
+def update_admin_by_id(admin_id, name, password):
+    with sqlite3.connect("database.db") as connection:
+        cursor = connection.cursor()
+        cursor.execute(
+            "UPDATE Admin SET username = ?, password = ? WHERE admin_id = ?",
+            (name, hash_password(password), admin_id),
+        )
+        connection.commit()
+        updated = cursor.rowcount > 0
+        cursor.close()
+    return updated
+
+
 #User Specific Functions.
 def get_all_users():
     with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
         cursor.execute("SELECT * FROM User")
         users = [
-            dict(user_id=row[0], name=row[1], date_of_birth=row[3])
+            dict(user_id=row[0], name=row[1], date_of_birth=row[3], hometown=row[4])
             for row in cursor.fetchall()
         ]
         cursor.close()

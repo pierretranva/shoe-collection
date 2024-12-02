@@ -2,22 +2,23 @@ import { Card, CardContent, Typography, Grid2, Box, IconButton } from '@mui/mate
 import HomeIcon from "@mui/icons-material/Home";
 import { useNavigate } from "react-router-dom";
 
-export default function AdminPage() {
+export default function Create() {
+    //Home button.
 	const navigate = useNavigate();
-
-    const cards = [
-        {title: 'Create', description: 'Insert new users, shoes, and admins into the database.'},
-        {title: 'Remove', description: 'Delete inappropriate users, shoes, posts, and admins from the database.'},
-        {title: 'Edit', description: 'Update old users, posts, and admins currently in the database.'},
-        {title: 'Metrics', description: 'View overall and admin specific metrics about the database.'}
-    ]
-
-	const handleHomeClick = () => {
-		navigate("/adminlogin");
+    const handleHomeClick = () => {
+		navigate("/admin");
 	};
 
+    //Different cards.
+    const cards = [
+        {title: 'User', description: 'Create a new user account for Shoe Collection.'},
+        {title: 'Shoe', description: 'Create a new shoe for Shoe Collection.'},
+        {title: 'Admin', description: 'Create a new admin account to moderate Shoe Collection.'},
+    ]
+
+    //Handle different cards.
     const handleCardClick = (card_type) => {
-        navigate(`/admin${card_type.toLowerCase()}`);
+        navigate(`/create${card_type.toLowerCase()}`);
     }
 
     const renderCards = (cards) => (
@@ -43,7 +44,7 @@ export default function AdminPage() {
         <Box sx={{ padding: 4, backgroundColor: '#f5f5f5' ,minHeight: '100vh' }}>
             <Box display="flex" justifyContent="center" alignItems="center" position="relative" mb={4}>
                 <Typography variant="h4" fontWeight="bold" textAlign="center" sx={{ width: '100%' }}>
-                    Admin Development
+                    Create Menu
                 </Typography>
 
                 <IconButton onClick={handleHomeClick} sx={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)' }}>
