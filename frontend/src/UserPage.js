@@ -1,4 +1,3 @@
-// import "./UserPage.css";
 import axios from "axios";
 import { useState, useEffect, useContext } from "react";
 import ScrollingList from "./ScrollingList";
@@ -14,7 +13,7 @@ export default function UserPage(props) {
 		axios.get(`http://127.0.0.1:8000/posts`, { params: { username: username, page_number: page } }).then((response) => {
 			setPosts(response.data);
 		});
-	}, [page]);
+	}, [username, page]);
 
 	return (
 		<>

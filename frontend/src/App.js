@@ -1,12 +1,12 @@
-import { React, useEffect, useState } from "react";
-import { Route, Routes, Router, useNavigate } from "react-router-dom";
-import "./App.css";
+import { React } from "react";
+import { Route, Routes } from "react-router-dom";
 import { Box } from "@mui/material";
 import { AuthProvider } from "./AuthContext";
 
 import Navbar from "./Navbar";
 import UserPage from "./UserPage";
-import AdminPage from "./AdminPage";
+import AdminLogin from './AdminLogin';
+import AdminPage from './AdminPage';
 import RegisterAccount from "./RegisterAccount";
 import Login from "./Login";
 import Profile from "./Profile";
@@ -22,6 +22,7 @@ export default function App() {
 				<Routes>
 					<Route path="/" element={<UserPage />} />
 					<Route path="/user" element={<UserPage />} />
+					<Route path="/adminlogin" element={<AdminLogin />} />
 					<Route path="/admin" element={<AdminPage />} />
 					<Route path="/register" element={<RegisterAccount />} />
 					<Route path="/login" element={<Login />} />

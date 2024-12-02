@@ -18,7 +18,7 @@ import { AuthContext } from "./AuthContext";
 const Navbar = ({ username, handleSignIn, handleLogout }) => {
 	const [anchorElNav, setAnchorElNav] = useState(null);
 	const [anchorElUser, setAnchorElUser] = useState(null);
-	const { signedIn, user, handleSignOut } = useContext(AuthContext);
+	const { signedIn, handleSignOut } = useContext(AuthContext);
 
 	const handleOpenNavMenu = (event) => {
 		setAnchorElNav(event.currentTarget);
@@ -52,7 +52,7 @@ const Navbar = ({ username, handleSignIn, handleLogout }) => {
 
 	const pages = [
 		{ name: "User", link: "/" },
-		{ name: "Admin", link: "/admin" },
+		{ name: "Admin", link: "/adminlogin" },
 		{ name: "Search", link: "/search" },
 		{ name: "Create Post", link: "/create" },
 	];

@@ -1,15 +1,44 @@
 import sqlite3
 import bcrypt
 
-
+#Encryption and Authentication.
 def hash_password(password):
     return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
-
 
 def check_password(input_password, stored_hashed_password):
     return bcrypt.checkpw(input_password.encode("utf-8"), stored_hashed_password)
 
+def verify_admin(username, password):
+    with sqlite3.connect("database.db") as connection:
+        cursor = connection.cursor()
+        cursor.execute("SELECT password FROM Admin WHERE username == ?", (username,))
+        row = cursor.fetchone()
+        cursor.close()
 
+        if row:
+            stored_password = row[0]
+            if check_password(password, stored_password):
+                return True
+    return False
+
+
+def verify_user(username, password):
+    with sqlite3.connect("database.db") as connection:
+        cursor = connection.cursor()
+        cursor.execute(
+            "SELECT password, user_id FROM User WHERE username == ?", (username,)
+        )
+        row = cursor.fetchone()
+        cursor.close()
+
+        if row:
+            stored_password = row[0]
+            if check_password(password, stored_password):
+                return True, row[1]
+    return False, -1
+
+
+#Creating Database Entities.
 def create_user(username, password, date_of_birth, hometown):
     with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
@@ -20,7 +49,6 @@ def create_user(username, password, date_of_birth, hometown):
         )
         connection.commit()
         cursor.close()
-
 
 def create_admin(username, password):
     with sqlite3.connect("database.db") as connection:
@@ -33,6 +61,7 @@ def create_admin(username, password):
         cursor.close()
 
 
+#Creates the initial admin.
 con = sqlite3.connect("database.db", timeout=1.0)
 cur = con.cursor()
 
@@ -50,6 +79,7 @@ except:
     create_admin("admin", "password")
 
 
+#User Specific Functions.
 def get_all_users():
     with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
@@ -60,7 +90,6 @@ def get_all_users():
         ]
         cursor.close()
     return users
-
 
 def get_user_by_id(user_id):
     with sqlite3.connect("database.db") as connection:
@@ -74,7 +103,6 @@ def get_user_by_id(user_id):
             )
     return None
 
-
 def delete_user_by_id(user_id):
     with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
@@ -83,7 +111,6 @@ def delete_user_by_id(user_id):
         deleted = cursor.rowcount > 0
         cursor.close()
     return deleted
-
 
 def update_user_by_id(user_id, name, date_of_birth, home_town):
     with sqlite3.connect("database.db") as connection:
@@ -97,7 +124,6 @@ def update_user_by_id(user_id, name, date_of_birth, home_town):
         cursor.close()
     return updated
 
-
 def edit_user_profile_by_id(user_id, password, date_of_birth, home_town):
     with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
@@ -110,7 +136,6 @@ def edit_user_profile_by_id(user_id, password, date_of_birth, home_town):
         cursor.close()
     return updated
 
-
 def get_id_by_username(username):
     with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
@@ -120,7 +145,6 @@ def get_id_by_username(username):
         if row:
             return row[0]
     return None
-
 
 def add_user_to_database(username, password, date_of_birth, hometown):
     with sqlite3.connect("database.db") as connection:
@@ -135,46 +159,6 @@ def add_user_to_database(username, password, date_of_birth, hometown):
         cursor.close()
     return username, id
 
-
-def get_post_comments(post_id):
-    with sqlite3.connect("database.db") as connection:
-        cursor = connection.cursor()
-        cursor.execute(
-            """
-            SELECT Comment.comment_id, Comment.text, Comment.date, Comment.creator_id, Comment.post_id, User.username
-            FROM Comment
-            JOIN User ON Comment.creator_id = User.user_id
-            WHERE Comment.post_id = ?
-            ORDER BY Comment.date ASC
-        """,
-            (post_id,),
-        )
-        comments = [
-            dict(
-                comment_id=row[0],
-                text=row[1],
-                date=row[2],
-                creator_id=row[3],
-                post_id=row[4],
-                username=row[5],
-            )
-            for row in cursor.fetchall()
-        ]
-        cursor.close()
-    return comments
-
-
-def add_post_comment():
-    with sqlite3.connect("database.db") as connection:
-        cursor = connection.cursor()
-        cursor.execute(
-            "INSERT INTO Comment (text, date, creator_id, post_id) VALUES (?, ?, ?, ?)",
-            (text, date, creator_id, post_id),
-        )
-        connection.commit()
-        cursor.close()
-
-
 def get_user_by_name(name):
     with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
@@ -187,6 +171,7 @@ def get_user_by_name(name):
     return users
 
 
+#Post Specific.
 def get_all_posts(page_number):
     with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
@@ -242,7 +227,6 @@ def get_all_posts(page_number):
 
     return posts
 
-
 def user_liked_post(user_id, post_id):
     with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
@@ -253,7 +237,6 @@ def user_liked_post(user_id, post_id):
         row = cursor.fetchone()
         cursor.close()
         return row[0] == 1
-
 
 def get_post_by_id(post_id):
     with sqlite3.connect("database.db") as connection:
@@ -272,7 +255,6 @@ def get_post_by_id(post_id):
                 date=row[6],
             )
     return None
-
 
 def get_post_by_userId(user_id):
     with sqlite3.connect("database.db") as connection:
@@ -326,7 +308,6 @@ def get_post_by_userId(user_id):
 
     return posts
 
-
 def delete_post_by_id(user_id):
     with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
@@ -335,7 +316,6 @@ def delete_post_by_id(user_id):
         deleted = cursor.rowcount > 0
         cursor.close()
     return deleted
-
 
 def update_post_by_id(
     post_id, caption, picture_url, is_selling, price, selling_link, date
@@ -350,68 +330,6 @@ def update_post_by_id(
         updated = cursor.rowcount > 0
         cursor.close()
     return updated
-
-
-def get_all_shoes():
-    with sqlite3.connect("database.db") as connection:
-        cursor = connection.cursor()
-        cursor.execute("SELECT * FROM Shoe")
-        shoes = [
-            dict(shoe_id=row[0], brand=row[1], model=row[2], year=row[3], color=row[4])
-            for row in cursor.fetchall()
-        ]
-        cursor.close()
-    return shoes
-
-
-def get_shoe_by_id(shoe_id):
-    with sqlite3.connect("database.db") as connection:
-        cursor = connection.cursor()
-        cursor.execute("SELECT * FROM Shoe WHERE shoe_id = ?", (shoe_id,))
-        row = cursor.fetchone()
-        cursor.close()
-        if row:
-            return dict(
-                shoe_id=row[0], brand=row[1], model=row[2], year=row[3], color=row[4]
-            )
-    return None
-
-
-def delete_shoe_by_id(shoe_id):
-    with sqlite3.connect("database.db") as connection:
-        cursor = connection.cursor()
-        cursor.execute("DELETE FROM Shoe WHERE shoe_id = ?", (shoe_id,))
-        connection.commit()
-        deleted = cursor.rowcount > 0
-        cursor.close()
-    return deleted
-
-
-def update_shoe_by_id(shoe_id, brand, model, year, color):
-    with sqlite3.connect("database.db") as connection:
-        cursor = connection.cursor()
-        cursor.execute(
-            "UPDATE Shoe SET brand = ?, model = ?, year = ?, color = ? WHERE shoe_id = ?",
-            (brand, model, year, color, shoe_id),
-        )
-        connection.commit()
-        updated = cursor.rowcount > 0
-        cursor.close()
-    return updated
-
-
-def add_shoe_to_database(brand, model, year, color):
-    with sqlite3.connect("database.db") as connection:
-        cursor = connection.cursor()
-        cursor.execute(
-            "INSERT INTO Shoe (brand, model, year, color) VALUES (?, ?, ?, ?)",
-            (brand, model, year, color),
-        )
-        connection.commit()
-        rowid = cursor.lastrowid
-        cursor.close()
-    return rowid
-
 
 def add_post_to_database(
     caption,
@@ -444,6 +362,63 @@ def add_post_to_database(
     return updated
 
 
+#Shoe specific.
+def get_all_shoes():
+    with sqlite3.connect("database.db") as connection:
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM Shoe")
+        shoes = [
+            dict(shoe_id=row[0], brand=row[1], model=row[2], year=row[3], color=row[4])
+            for row in cursor.fetchall()
+        ]
+        cursor.close()
+    return shoes
+
+def get_shoe_by_id(shoe_id):
+    with sqlite3.connect("database.db") as connection:
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM Shoe WHERE shoe_id = ?", (shoe_id,))
+        row = cursor.fetchone()
+        cursor.close()
+        if row:
+            return dict(
+                shoe_id=row[0], brand=row[1], model=row[2], year=row[3], color=row[4]
+            )
+    return None
+
+def delete_shoe_by_id(shoe_id):
+    with sqlite3.connect("database.db") as connection:
+        cursor = connection.cursor()
+        cursor.execute("DELETE FROM Shoe WHERE shoe_id = ?", (shoe_id,))
+        connection.commit()
+        deleted = cursor.rowcount > 0
+        cursor.close()
+    return deleted
+
+def update_shoe_by_id(shoe_id, brand, model, year, color):
+    with sqlite3.connect("database.db") as connection:
+        cursor = connection.cursor()
+        cursor.execute(
+            "UPDATE Shoe SET brand = ?, model = ?, year = ?, color = ? WHERE shoe_id = ?",
+            (brand, model, year, color, shoe_id),
+        )
+        connection.commit()
+        updated = cursor.rowcount > 0
+        cursor.close()
+    return updated
+
+def add_shoe_to_database(brand, model, year, color):
+    with sqlite3.connect("database.db") as connection:
+        cursor = connection.cursor()
+        cursor.execute(
+            "INSERT INTO Shoe (brand, model, year, color) VALUES (?, ?, ?, ?)",
+            (brand, model, year, color),
+        )
+        connection.commit()
+        rowid = cursor.lastrowid
+        cursor.close()
+    return rowid
+
 def get_all_shoe_brands():
     with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
@@ -451,7 +426,6 @@ def get_all_shoe_brands():
         brands = [row[0] for row in cursor.fetchall()]
         cursor.close()
     return brands
-
 
 def get_all_shoe_models(brand):
     with sqlite3.connect("database.db") as connection:
@@ -461,7 +435,6 @@ def get_all_shoe_models(brand):
         cursor.close()
     return models
 
-
 def get_all_shoe_colors():
     with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
@@ -469,7 +442,6 @@ def get_all_shoe_colors():
         colors = [row[0] for row in cursor.fetchall()]
         cursor.close()
     return colors
-
 
 def get_shoe_id(brand, model, year, color):
     with sqlite3.connect("database.db") as connection:
@@ -485,36 +457,7 @@ def get_shoe_id(brand, model, year, color):
     return None
 
 
-def verify_admin(username, password):
-    with sqlite3.connect("database.db") as connection:
-        cursor = connection.cursor()
-        cursor.execute("SELECT password FROM Admin WHERE username == ?", (username,))
-        row = cursor.fetchone()
-        cursor.close()
-
-        if row:
-            stored_password = row[0]
-            if check_password(password, stored_password):
-                return True
-    return False
-
-
-def verify_user(username, password):
-    with sqlite3.connect("database.db") as connection:
-        cursor = connection.cursor()
-        cursor.execute(
-            "SELECT password, user_id FROM User WHERE username == ?", (username,)
-        )
-        row = cursor.fetchone()
-        cursor.close()
-
-        if row:
-            stored_password = row[0]
-            if check_password(password, stored_password):
-                return True, row[1]
-    return False, -1
-
-
+#Profile Metrics.
 def number_of_followers(user_id):
     with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
@@ -524,7 +467,6 @@ def number_of_followers(user_id):
         cursor.close()
     return len(rows)
 
-
 def number_of_following(user_id):
     with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
@@ -533,7 +475,6 @@ def number_of_following(user_id):
 
         cursor.close()
     return len(rows)
-
 
 def unfollow(user_id, other_user_id):
     with sqlite3.connect("database.db") as connection:
@@ -545,7 +486,6 @@ def unfollow(user_id, other_user_id):
         connection.commit()
         cursor.close()
 
-
 def follow(user_id, other_user_id):
     with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
@@ -555,7 +495,6 @@ def follow(user_id, other_user_id):
         )
         connection.commit()
         cursor.close()
-
 
 def is_following(user_id, other_user_id):
     with sqlite3.connect("database.db") as connection:
@@ -571,6 +510,7 @@ def is_following(user_id, other_user_id):
     return False
 
 
+#Post Interaction.
 def add_comment_to_post(post_id, user_id, text, date):
     with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
@@ -581,6 +521,32 @@ def add_comment_to_post(post_id, user_id, text, date):
         connection.commit()
         cursor.close()
 
+def get_post_comments(post_id):
+    with sqlite3.connect("database.db") as connection:
+        cursor = connection.cursor()
+        cursor.execute(
+            """
+            SELECT Comment.comment_id, Comment.text, Comment.date, Comment.creator_id, Comment.post_id, User.username
+            FROM Comment
+            JOIN User ON Comment.creator_id = User.user_id
+            WHERE Comment.post_id = ?
+            ORDER BY Comment.date ASC
+        """,
+            (post_id,),
+        )
+        comments = [
+            dict(
+                comment_id=row[0],
+                text=row[1],
+                date=row[2],
+                creator_id=row[3],
+                post_id=row[4],
+                username=row[5],
+            )
+            for row in cursor.fetchall()
+        ]
+        cursor.close()
+    return comments
 
 def db_like_post(post_id, user_id):
     with sqlite3.connect("database.db") as connection:
@@ -591,7 +557,6 @@ def db_like_post(post_id, user_id):
         connection.commit()
         cursor.close()
 
-
 def db_unlike_post(post_id, user_id):
     with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
@@ -601,7 +566,6 @@ def db_unlike_post(post_id, user_id):
         connection.commit()
         cursor.close()
 
-
 def get_post_likes(post_id):
     with sqlite3.connect("database.db") as connection:
         cursor = connection.cursor()
@@ -609,7 +573,6 @@ def get_post_likes(post_id):
         rows = cursor.fetchall()
         cursor.close()
     return len(rows)
-
 
 def get_if_user_likes_post(user_id, post_id):
     with sqlite3.connect("database.db") as connection:

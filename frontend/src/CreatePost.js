@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import { AuthContext } from "./AuthContext";
+
 const CreatePost = (props) => {
 	const [caption, setCaption] = useState("");
 	const [pictureUrl, setPictureUrl] = useState("");
@@ -127,8 +128,8 @@ const CreatePost = (props) => {
 	if (!signedIn) {
 		return (
 			<Container maxWidth="sm">
-				<Typography variant="h4" component="h1" gutterBottom align="center" sx={{ paddingTop: 2 }}>
-					Please sign in to create a post
+				<Typography variant="h4" component="h1" color="black" fontWeight="bold" align="center" sx={{ paddingTop: 2 }}>
+					Please Sign In To Create A Post
 				</Typography>
 			</Container>
 		);
@@ -136,7 +137,7 @@ const CreatePost = (props) => {
 
 	return (
 		<Container maxWidth="sm">
-			<Typography variant="h4" component="h1" gutterBottom align="center" sx={{ paddingTop: 2 }}>
+			<Typography variant="h4" component="h1" gutterBottom align="center" fontWeight="bold" sx={{ paddingTop: 2 }}>
 				Create Post
 			</Typography>
 			<Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>

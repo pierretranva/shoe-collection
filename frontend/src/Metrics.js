@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { Avatar, Box, Typography, Button, Stack, IconButton } from "@mui/material";
+import { Card, CardContent, Typography, Grid2, Box, IconButton } from '@mui/material';
 import HomeIcon from "@mui/icons-material/Home";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import './Metrics.css'
 
 export default function Metrics() {
     const [totalUsers, setTotalUsers] = useState(0);
@@ -11,12 +12,28 @@ export default function Metrics() {
     const [totalComments, setTotalComments] = useState(0);
     const [sumPrice, setSumPrice] = useState(0);
 
+    const overall_metrics = [
+        {description: 'Total Users:', data: totalUsers},
+        {description: 'Total Posts:', data: totalPosts},
+        {description: 'Total Likes:', data: totalLikes},
+        {description: 'Total Comments:', data: totalComments},
+        {description: 'Total Shoe Prices:', data: '$' + sumPrice},
+    ]
+
     const [oldestUser, setOldestUser] = useState("No Users");
     const [youngestUser, setYoungestUser] = useState("No Users");
     const [avgPrice, setAvgPrice] = useState(0);
     const [avgYear, setAvgYear] = useState(0);
     const [mostExpensiveShoe, setMostExpensiveShoe] = useState("No Shoes");
 	const navigate = useNavigate();
+
+    const admin_metrics = [
+        {description: 'Oldest User:', data: oldestUser},
+        {description: 'Youngest User:', data: youngestUser},
+        {description: 'Average Shoe Price:', data: '$' + avgPrice.toFixed(2)},
+        {description: 'Average Shoe Model Year:', data: avgYear.toFixed(2)},
+        {description: 'Most Expensive Shoe:', data: mostExpensiveShoe},
+    ]
 
 	const handleHomeClick = () => {
 		navigate("/admin");
@@ -53,32 +70,50 @@ export default function Metrics() {
         axios
             .get(`http://localhost:8000/get_most_expensive_shoe`)
             .then((response) => setMostExpensiveShoe(response.data));
-	});
+	}, []);
 
-	return (
-        <Box sx={{ maxWidth: 600, margin: "auto", padding: 2 }}>
-            <IconButton onClick={handleHomeClick}>
-							<HomeIcon />
-			</IconButton>
+    const renderMetrics = (metric_type) => (
+        <Grid2 container spacing={4} justifyContent="center">
+            {metric_type.map((metric, index) => (
+                <Grid2 item xs={12} sm={6} md={4} key={index}>
+                    <Card sx={{ boxShadow: 3, padding: 2, textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                        <CardContent>
+                            <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'darkgray', marginBottom: 0, fontSize: '1.5rem' }}>
+                                {metric.description}
+                            </Typography>
+                            <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'dodgerblue', marginTop: 1, fontSize: '2rem' }}>
+                                {metric.data}
+                            </Typography>
+                            <Typography variant="caption" sx={{ fontStyle: 'italic', color: 'darkgray', marginTop: 0 }}>
+                                (currently in system)
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </Grid2>
+            ))}
+        </Grid2>
+    );
 
-			{/* Overall Metrics */}
-			<Box display="flex" justifyContent="space-between" marginBottom={2}>
-                <Typography>Total Users: {totalUsers}</Typography>
-                <Typography>Total Posts: {totalPosts}</Typography>
-                <Typography>Total Likes: {totalLikes}</Typography>
-                <Typography>Total Comments:: {totalComments}</Typography>
-                <Typography>Total Shoe Prices: {sumPrice}</Typography>
-			</Box>
-
-            {/* Admin Metrics */}
-			<Box display="flex" justifyContent="space-between" marginBottom={2}>
-                <Typography>Oldest User: {oldestUser}</Typography>
-                <Typography>Youngest User: {youngestUser}</Typography>
-                <Typography>Average Shoe Price: {avgPrice}</Typography>
-                <Typography>Average Shoe Model Year: {avgYear}</Typography>
-                <Typography>Most Expensive Shoe: {mostExpensiveShoe}</Typography>
-			</Box>
+    return (
+        <Box sx={{ padding: 4, backgroundColor: '#f5f5f5' }}>
+            <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
+                <Typography variant="h4" fontWeight="bold" textAlign="center" sx={{ width: '100%' }}>
+                    Overall Metrics
+                </Typography>
+                <IconButton onClick={handleHomeClick}>
+                    <HomeIcon sx={{ color: 'darkgray' }} />
+                </IconButton>
+            </Box>
             
-		</Box>
-	);
+            {renderMetrics(overall_metrics)}
+            
+            <Box mt={6} mb={4}>
+                <Typography variant="h4" fontWeight="bold" textAlign="center">
+                    Admin Metrics
+                </Typography>
+            </Box>
+            
+            {renderMetrics(admin_metrics)}
+        </Box>
+    );
 };

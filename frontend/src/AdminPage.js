@@ -6,11 +6,6 @@ import { useNavigate } from 'react-router-dom';
 
 
 export default function AdminPage() {
-  const [adminUsername, setAdminUsername] = useState("");
-  const [adminPassword, setAdminPassword] = useState("");
-  const [adminVerified, setAdminVerified] = useState(false);
-  const [loginErrorMessage, setLoginErrorMessage] = useState(false);
-
   //Sets up selected operations and defines current operations and attributes
   const [selectedOperation, setOperation] = useState(null);
   const [selectedAttribute, setAttribute] = useState(null);
@@ -380,32 +375,9 @@ export default function AdminPage() {
       );
     }
 
-    const handleAdminLogin = async () => {
-        try {
-            setLoginErrorMessage(false);
-            const loginResponse = await axios.put('http://localhost:8000/admin/login', {
-                "username" : adminUsername,
-                "password" : adminPassword
-            });
-
-            const verified = loginResponse.data.status;
-            if (verified) {
-                setLoginErrorMessage(false);
-                setAdminVerified(true);
-            } else {
-                setLoginErrorMessage(true);
-            }
-        } catch (error) {
-            console.error('Admin Login error:', error);
-            setLoginErrorMessage(true);
-        }
-    };
-
-
     return (
         <div className="App">
             <header className="App-header">
-                {adminVerified ? (
                     <>
                         {/*Loads initial screen to prompt admin to select an operation*/}
                         {!selectedOperation && (
@@ -443,7 +415,7 @@ export default function AdminPage() {
                                             </button>
                                         ))}
                                     <button onClick={cancelClick}>Cancel</button>
-                                </div>
+                                </div> 
                             </>
                         )}
 
@@ -455,41 +427,6 @@ export default function AdminPage() {
                             </>
                         )}
                     </>
-                ) : (
-                    <>
-                        <h2>Admin Login</h2>
-                        <input
-                            type="text"
-                            placeholder="Email"
-                            value={adminUsername}
-                            onChange={(e) => setAdminUsername(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    handleAdminLogin();
-                                }
-                            }}
-                            style={{margin: '10px', padding: '10px'}}
-                        />
-                        <br/>
-                        <input
-                            type="password"
-                            placeholder="Password"
-                            value={adminPassword}
-                            onChange={(e) => setAdminPassword(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    handleAdminLogin();
-                                }
-                            }}
-                            style={{margin: '10px', padding: '10px'}}
-                        />
-                        <br/>
-                        <button onClick={handleAdminLogin} style={{padding: '10px 20px'}}>
-                            Login
-                        </button>
-                        {loginErrorMessage && <p style={{color: 'red'}}>Failed to Login</p>}
-                    </>)
-                }
             </header>
         </div>
     );

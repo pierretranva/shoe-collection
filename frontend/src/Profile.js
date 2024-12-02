@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext, useRef } from "react";
+import { useEffect, useState, useContext } from "react";
 import { Avatar, Box, Typography, Button, Stack, IconButton, TextField } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import { useNavigate, useParams } from "react-router-dom";
@@ -128,13 +128,13 @@ const Profile = () => {
 				});
 			} catch (error) {}
 		}
-	}, [userId]);
+	}, [profileUsername, username, signedIn, userId]);
 
 	if (isEditingProfile) {
 		return (
 			<Box sx={{ maxWidth: 600, margin: "auto", padding: 2 }}>
-				<Typography variant="h4" marginBottom={2}>
-					Edit Profile
+				<Typography variant="h4"  fontWeight="bold" marginBottom={2}>
+					Edit Profile:
 				</Typography>
 				<TextField
 					label="Password"
@@ -151,6 +151,9 @@ const Profile = () => {
 					margin="normal"
 					value={date}
 					onChange={(e) => setDate(e.target.value)}
+					InputLabelProps={{
+						shrink: true,
+					}}
 				/>
 				<TextField
 					label="Hometown"

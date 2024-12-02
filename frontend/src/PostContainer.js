@@ -19,7 +19,6 @@ import {
 	AccordionDetails,
 } from "@mui/material";
 import InputAdornment from "@mui/material/InputAdornment";
-import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import CommentIcon from "@mui/icons-material/Comment";
@@ -38,7 +37,6 @@ const PostCard = (props) => {
 		date,
 		is_selling,
 		like_count,
-		liked,
 		model,
 		picture_url,
 		post_id,
@@ -46,6 +44,8 @@ const PostCard = (props) => {
 		selling_link,
 		year,
 	} = props.post_data;
+	
+	// eslint-disable-next-line
 	const [userId, setUserId] = useState(props.userId);
 	const [isLiked, setIsLiked] = useState(false);
 	const [likeCount, setLikeCount] = useState(like_count);
@@ -74,7 +74,7 @@ const PostCard = (props) => {
 		if (!pictureUrl.includes("http")) {
 			setPictureUrl(randomImage[Math.floor(Math.random() * randomImage.length)]);
 		}
-	}, []);
+	}, [pictureUrl, post_id]);
 	useEffect(() => {
 		if (userId === null) {
 			return;
@@ -94,13 +94,12 @@ const PostCard = (props) => {
 					}
 				});
 		}
-	}, [userId]);
+	}, [pictureUrl, post_id, userId]);
 	const handleSendComment = (e) => {
 		let currDate = new Date().toISOString().slice(0, 19).replace("T", " ");
 		axios
 			.post("http://localhost:8000/comments", { post_id: post_id, user_id: userId, text: commentText, date: currDate })
 			.then((response) => {
-				// console.log(response.data)
 				setCommentText("");
 				handleGetComments();
 			});

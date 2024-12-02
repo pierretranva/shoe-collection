@@ -1,7 +1,6 @@
 from typing import Optional
-
 from sqlmodel import Field, SQLModel
-from sqlmodel import SQLModel, Field, create_engine
+from sqlmodel import SQLModel, Field
 
 class User(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)

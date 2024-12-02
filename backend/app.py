@@ -2,7 +2,6 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
-
 from database import (
     get_all_users,
     get_user_by_id,
@@ -72,12 +71,12 @@ app.add_middleware(
 )
 
 
+#Basic classes to change different database object.
 class UpdateUserPayload(BaseModel):
     user_id: int
     name: str
     date_of_birth: str
     hometown: str
-
 
 class EditProfileUserPayload(BaseModel):
     user_id: int
@@ -85,13 +84,11 @@ class EditProfileUserPayload(BaseModel):
     date_of_birth: str
     hometown: str
 
-
 class CreateUserPayload(BaseModel):
     name: str
     password: str
     date_of_birth: str
     hometown: str
-
 
 class UpdatePostPayload(BaseModel):
     post_id: int
@@ -102,7 +99,6 @@ class UpdatePostPayload(BaseModel):
     selling_link: str
     date: str
 
-
 class UpdateShoePayload(BaseModel):
     shoe_id: int
     brand: str
@@ -110,18 +106,15 @@ class UpdateShoePayload(BaseModel):
     year: int
     color: str
 
-
 class CreateShoePayload(BaseModel):
     brand: str
     model: str
     year: int
     color: str
 
-
 class LoginPayload(BaseModel):
     username: str
     password: str
-
 
 class AddPostPayload(BaseModel):
     username: str
@@ -136,11 +129,9 @@ class AddPostPayload(BaseModel):
     year: int
     color: str
 
-
 class LikePostPayload(BaseModel):
     post_id: int
     user_id: int
-
 
 class CommentPostPayload(BaseModel):
     post_id: int
@@ -149,15 +140,14 @@ class CommentPostPayload(BaseModel):
     date: str
 
 
+#Initial Endpoints for login.
 @app.get("/health")
 def health():
     return {"status": "ok"}
 
-
 @app.put("/admin/login")
 def login_admin(payload: LoginPayload):
     return {"status": verify_admin(payload.username, payload.password)}
-
 
 @app.put("/user/login")
 def login_user(payload: LoginPayload):
@@ -165,11 +155,11 @@ def login_user(payload: LoginPayload):
     return {"status": status, "user_id": user_id}
 
 
+#User based endpoints.
 @app.get("/users")
 def get_users():
     users = get_all_users()
     return users
-
 
 @app.get("/users/{user_id}")
 def get_user(user_id: int):
@@ -178,28 +168,7 @@ def get_user(user_id: int):
         return user
     else:
         raise HTTPException(status_code=404, detail="User not found")
-
-
-@app.get("/shoe/brands")
-def get_shoe_brands():
-    brands = get_all_shoe_brands()
-    print(brands)
-    return brands
-
-
-@app.get("/shoe/colors")
-def get_shoe_colors():
-    colors = get_all_shoe_colors()
-    return colors
-
-
-@app.get("/shoe/models/{brand}")
-def get_shoe_models(brand: str):
-    models = get_all_shoe_models(brand)
-    print(models)
-    return models
-
-
+    
 @app.delete("/users/{user_id}")
 def delete_user(user_id: int):
     deleted = delete_user_by_id(user_id)
@@ -207,8 +176,105 @@ def delete_user(user_id: int):
         return {"message": "User deleted successfully"}
     else:
         raise HTTPException(status_code=404, detail="User not found")
+    
+@app.put("/update_users")
+def update_user(payload: UpdateUserPayload):
+    updated = update_user_by_id(
+        payload.user_id, payload.name, payload.date_of_birth, payload.hometown
+    )
+    if updated:
+        return {"message": "User updated successfully"}
+    else:
+        raise HTTPException(status_code=404, detail="User not found")
+
+@app.put("/add_users")
+def add_user(payload: CreateUserPayload):
+    if len(get_user_by_name(payload.name)) > 0:
+        raise HTTPException(status_code=404, detail="Username already exists")
+    updated, user_id = add_user_to_database(
+        payload.name, payload.password, payload.date_of_birth, payload.hometown
+    )
+    if updated:
+        return {
+            "message": "User created successfully",
+            "username": payload.name,
+            "user_id": user_id,
+        }
+    else:
+        raise HTTPException(status_code=404, detail="User not created")
+
+@app.get("/users/name/{name}")
+def get_users_by_name(name: str):
+    users = get_user_by_name(name)
+    if users:
+        return users
+    else:
+        raise HTTPException(
+            status_code=404, detail="No users found with the given name"
+        )
 
 
+#Shoe based endpoints.
+@app.get("/shoe/brands")
+def get_shoe_brands():
+    brands = get_all_shoe_brands()
+    print(brands)
+    return brands
+
+@app.get("/shoe/colors")
+def get_shoe_colors():
+    colors = get_all_shoe_colors()
+    return colors
+
+@app.get("/shoe/models/{brand}")
+def get_shoe_models(brand: str):
+    models = get_all_shoe_models(brand)
+    print(models)
+    return models
+
+@app.get("/shoes")
+def get_shoes():
+    shoes = get_all_shoes()
+    return shoes
+
+@app.get("/shoes/{shoe_id}")
+def get_shoe(shoe_id: int):
+    shoe = get_shoe_by_id(shoe_id)
+    if shoe:
+        return shoe
+    else:
+        raise HTTPException(status_code=404, detail="Shoe not found")
+
+@app.delete("/shoes/{shoe_id}")
+def delete_shoe(shoe_id: int):
+    deleted = delete_shoe_by_id(shoe_id)
+    if deleted:
+        return {"message": "Shoe deleted successfully"}
+    else:
+        raise HTTPException(status_code=404, detail="Shoe not found")
+
+@app.put("/update_shoes")
+def update_user(payload: UpdateShoePayload):
+    updated = update_shoe_by_id(
+        payload.shoe_id, payload.brand, payload.model, payload.year, payload.color
+    )
+    if updated:
+        return {"message": "Shoe updated successfully"}
+    else:
+        raise HTTPException(status_code=404, detail="Shoe not found")
+
+@app.put("/add_shoes")
+def add_user(payload: CreateShoePayload):
+    updated = add_shoe_to_database(
+        payload.brand, payload.model, payload.year, payload.color
+    )
+    if updated:
+        return {"message": "Shoe created successfully"}
+    else:
+        raise HTTPException(status_code=404, detail="Shoe not created")
+
+
+#Post based endpoints.
 @app.put("/post")
 def add_post(payload: AddPostPayload):
     userData = get_user_by_name(payload.username)
@@ -234,57 +300,6 @@ def add_post(payload: AddPostPayload):
     else:
         raise HTTPException(status_code=404, detail="Post not created")
 
-
-@app.put("/update_users")
-def update_user(payload: UpdateUserPayload):
-    updated = update_user_by_id(
-        payload.user_id, payload.name, payload.date_of_birth, payload.hometown
-    )
-    if updated:
-        return {"message": "User updated successfully"}
-    else:
-        raise HTTPException(status_code=404, detail="User not found")
-
-
-@app.put("/edit_profile")
-def edit_profile(payload: EditProfileUserPayload):
-    updated = edit_user_profile_by_id(
-        payload.user_id, payload.password, payload.date_of_birth, payload.hometown
-    )
-    if updated:
-        return {"message": "User updated successfully"}
-    else:
-        raise HTTPException(status_code=404, detail="User not found")
-
-
-@app.put("/add_users")
-def add_user(payload: CreateUserPayload):
-    if len(get_user_by_name(payload.name)) > 0:
-        raise HTTPException(status_code=404, detail="Username already exists")
-    updated, user_id = add_user_to_database(
-        payload.name, payload.password, payload.date_of_birth, payload.hometown
-    )
-    if updated:
-        return {
-            "message": "User created successfully",
-            "username": payload.name,
-            "user_id": user_id,
-        }
-    else:
-        raise HTTPException(status_code=404, detail="User not created")
-
-
-@app.get("/users/name/{name}")
-def get_users_by_name(name: str):
-    users = get_user_by_name(name)
-    if users:
-        return users
-    else:
-        raise HTTPException(
-            status_code=404, detail="No users found with the given name"
-        )
-
-
 @app.get("/posts")
 def get_posts(username: Optional[str] = None, page_number: Optional[int] = 1):
     posts = get_all_posts(page_number)
@@ -300,7 +315,6 @@ def get_posts(username: Optional[str] = None, page_number: Optional[int] = 1):
 
     return posts
 
-
 @app.get("/posts/{post_id}")
 def get_post(post_id: int):
     post = get_post_by_id(post_id)
@@ -308,7 +322,6 @@ def get_post(post_id: int):
         return post
     else:
         raise HTTPException(status_code=404, detail="Post not found")
-
 
 @app.get("/posts/user_id/{user_id}")
 def get_posts_by_username(user_id: int):
@@ -318,34 +331,6 @@ def get_posts_by_username(user_id: int):
     else:
         raise HTTPException(status_code=404, detail="Post not found")
 
-
-@app.get("/followers/{user_id}")
-def get_followers(user_id: int):
-    count = number_of_followers(user_id)
-    return count
-
-
-@app.get("/following/{user_id}")
-def get_following(user_id: int):
-    count = number_of_following(user_id)
-    return count
-
-
-@app.get("/is_following/{user_id}/{other_user_id}")
-def is_follow_user(user_id: int, other_user_id: int):
-    return {"status": is_following(user_id, other_user_id)}
-
-
-@app.get("/unfollow/{user_id}/{other_user_id}")
-def unfollow_user(user_id: int, other_user_id: int):
-    unfollow(user_id, other_user_id)
-
-
-@app.get("/follow/{user_id}/{other_user_id}")
-def follow_user(user_id: int, other_user_id: int):
-    follow(user_id, other_user_id)
-
-
 @app.delete("/posts/{post_id}")
 def delete_user(post_id: int):
     deleted = delete_post_by_id(post_id)
@@ -353,7 +338,6 @@ def delete_user(post_id: int):
         return {"message": "Post deleted successfully"}
     else:
         raise HTTPException(status_code=404, detail="Post not found")
-
 
 @app.put("/update_posts")
 def update_user(payload: UpdatePostPayload):
@@ -372,89 +356,41 @@ def update_user(payload: UpdatePostPayload):
         raise HTTPException(status_code=404, detail="Post not found")
 
 
-@app.get("/shoes")
-def get_shoes():
-    shoes = get_all_shoes()
-    return shoes
-
-
-@app.get("/shoes/{shoe_id}")
-def get_shoe(shoe_id: int):
-    shoe = get_shoe_by_id(shoe_id)
-    if shoe:
-        return shoe
-    else:
-        raise HTTPException(status_code=404, detail="Shoe not found")
-
-
-@app.delete("/shoes/{shoe_id}")
-def delete_shoe(shoe_id: int):
-    deleted = delete_shoe_by_id(shoe_id)
-    if deleted:
-        return {"message": "Shoe deleted successfully"}
-    else:
-        raise HTTPException(status_code=404, detail="Shoe not found")
-
-
-@app.put("/update_shoes")
-def update_user(payload: UpdateShoePayload):
-    updated = update_shoe_by_id(
-        payload.shoe_id, payload.brand, payload.model, payload.year, payload.color
+#Profile based endpoints.
+@app.put("/edit_profile")
+def edit_profile(payload: EditProfileUserPayload):
+    updated = edit_user_profile_by_id(
+        payload.user_id, payload.password, payload.date_of_birth, payload.hometown
     )
     if updated:
-        return {"message": "Shoe updated successfully"}
+        return {"message": "User updated successfully"}
     else:
-        raise HTTPException(status_code=404, detail="Shoe not found")
+        raise HTTPException(status_code=404, detail="User not found")
+
+@app.get("/followers/{user_id}")
+def get_followers(user_id: int):
+    count = number_of_followers(user_id)
+    return count
+
+@app.get("/following/{user_id}")
+def get_following(user_id: int):
+    count = number_of_following(user_id)
+    return count
+
+@app.get("/is_following/{user_id}/{other_user_id}")
+def is_follow_user(user_id: int, other_user_id: int):
+    return {"status": is_following(user_id, other_user_id)}
+
+@app.get("/unfollow/{user_id}/{other_user_id}")
+def unfollow_user(user_id: int, other_user_id: int):
+    unfollow(user_id, other_user_id)
+
+@app.get("/follow/{user_id}/{other_user_id}")
+def follow_user(user_id: int, other_user_id: int):
+    follow(user_id, other_user_id)
 
 
-@app.put("/add_shoes")
-def add_user(payload: CreateShoePayload):
-    updated = add_shoe_to_database(
-        payload.brand, payload.model, payload.year, payload.color
-    )
-    if updated:
-        return {"message": "Shoe created successfully"}
-    else:
-        raise HTTPException(status_code=404, detail="Shoe not created")
-
-
-# Get Endpoints for Metrics:
-@app.get("/get_total_users")
-def total_users():
-    metric = get_total_users()
-    if metric:
-        return metric
-    else:
-        return 0
-
-
-@app.get("/get_total_posts")
-def total_posts():
-    metric = get_total_posts()
-    if metric:
-        return metric
-    else:
-        raise HTTPException(status_code=404, detail="Metric Created Unsuccessfully")
-
-
-@app.get("/get_total_likes")
-def total_likes():
-    metric = get_total_likes()
-    if metric:
-        return metric
-    else:
-        return 0
-
-
-@app.get("/get_total_comments")
-def total_comments():
-    metric = get_total_comments()
-    if metric:
-        return metric
-    else:
-        return 0
-
-
+#Post Interaction Endpoints.
 @app.get("/comments/{post_id}")
 def get_all_comments_from_post(post_id: int):
     metrics = get_post_comments(post_id)
@@ -463,123 +399,20 @@ def get_all_comments_from_post(post_id: int):
     else:
         return []
 
-
 @app.post("/comments")
 def add_comment(payload: CommentPostPayload):
     add_comment_to_post(payload.post_id, payload.user_id, payload.text, payload.date)
     return {"status": "ok"}
-
-
-@app.get("/get_sum_price")
-def sum_price():
-    metric = get_sum_price()
-    if metric:
-        return metric
-    else:
-        raise HTTPException(status_code=404, detail="Metric Created Unsuccessfully")
-
-
-@app.get("/get_oldest_user")
-def oldest_user():
-    metric = get_oldest_user()
-    if metric:
-        return metric
-    else:
-        return "No Users in Database"
-
-
-@app.get("/get_youngest_user")
-def yougest_user():
-    metric = get_youngest_user()
-    if metric:
-        return metric
-    else:
-        return "No Users in Database"
-
-
-@app.get("/get_avg_price")
-def avg_price():
-    metric = get_avg_price()
-    if metric:
-        return metric
-    else:
-        raise HTTPException(status_code=404, detail="Metric Created Unsuccessfully")
-
-
-@app.get("/get_avg_year")
-def avg_year():
-    metric = get_avg_year()
-    if metric:
-        return metric
-    else:
-        raise HTTPException(status_code=404, detail="Metric Created Unsuccessfully")
-
-
-@app.get("/get_most_expensive_shoe")
-def most_expensive_shoe():
-    metric = get_most_expensive_shoe()
-    if metric:
-        return metric
-    else:
-        raise HTTPException(status_code=404, detail="Metric Created Unsuccessfully")
-
-
-@app.get("/get_user_post_count/{user_id}")
-def user_post_count(user_id):
-    metric = get_user_post_count(user_id)
-    if metric:
-        return metric
-    else:
-        raise HTTPException(status_code=404, detail="Metric Created Unsuccessfully")
-
-
-@app.get("/get_user_follower_count/{user_id}")
-def user_follower_count(user_id):
-    metric = get_user_follower_count(user_id)
-    if metric:
-        return metric
-    else:
-        return 0
-
-
-@app.get("/get_following_count/{user_id}")
-def following_count(user_id):
-    metric = get_following_count(user_id)
-    if metric:
-        return metric
-    else:
-        return 0
-
-
-@app.get("/get_for_sale_posts/{user_id}")
-def for_sale_posts(user_id):
-    metric = get_for_sale_posts(user_id)
-    if metric:
-        return metric
-    else:
-        return 0
-
-
-@app.get("/get_favorite_shoe_brand/{user_id}")
-def favorite_shoe_brand(user_id):
-    metric = get_favorite_shoe_brand(user_id)
-    if metric:
-        return metric
-    else:
-        raise HTTPException(status_code=404, detail="Metric Created Unsuccessfully")
-
 
 @app.post("/like_post")
 def like_post(payload: LikePostPayload):
     db_like_post(payload.post_id, payload.user_id)
     return {"status": "ok"}
 
-
 @app.post("/unlike_post")
 def unlike_post(payload: LikePostPayload):
     db_unlike_post(payload.post_id, payload.user_id)
     return {"status": "ok"}
-
 
 @app.get("/check_like")
 def check_if_liked(post_id: int, user_id: int):
@@ -598,6 +431,132 @@ def search(searchType: str, query: str):
         return posts
 
     raise HTTPException(status_code=400, detail="Bad Search Request")
+
+
+#Overall Metrics:
+@app.get("/get_total_users")
+def total_users():
+    metric = get_total_users()
+    if metric:
+        return metric
+    else:
+        return 0
+
+@app.get("/get_total_posts")
+def total_posts():
+    metric = get_total_posts()
+    if metric:
+        return metric
+    else:
+        raise HTTPException(status_code=404, detail="Metric Created Unsuccessfully")
+
+@app.get("/get_total_likes")
+def total_likes():
+    metric = get_total_likes()
+    if metric:
+        return metric
+    else:
+        return 0
+
+@app.get("/get_total_comments")
+def total_comments():
+    metric = get_total_comments()
+    if metric:
+        return metric
+    else:
+        return 0
+
+@app.get("/get_sum_price")
+def sum_price():
+    metric = get_sum_price()
+    if metric:
+        return metric
+    else:
+        raise HTTPException(status_code=404, detail="Metric Created Unsuccessfully")
+
+
+#Admin Metrics.
+@app.get("/get_oldest_user")
+def oldest_user():
+    metric = get_oldest_user()
+    if metric:
+        return metric
+    else:
+        return "No Users in Database"
+
+@app.get("/get_youngest_user")
+def yougest_user():
+    metric = get_youngest_user()
+    if metric:
+        return metric
+    else:
+        return "No Users in Database"
+
+@app.get("/get_avg_price")
+def avg_price():
+    metric = get_avg_price()
+    if metric:
+        return metric
+    else:
+        raise HTTPException(status_code=404, detail="Metric Created Unsuccessfully")
+
+@app.get("/get_avg_year")
+def avg_year():
+    metric = get_avg_year()
+    if metric:
+        return metric
+    else:
+        raise HTTPException(status_code=404, detail="Metric Created Unsuccessfully")
+
+@app.get("/get_most_expensive_shoe")
+def most_expensive_shoe():
+    metric = get_most_expensive_shoe()
+    if metric:
+        return metric
+    else:
+        raise HTTPException(status_code=404, detail="Metric Created Unsuccessfully")
+
+
+#User Metrics.
+@app.get("/get_user_post_count/{user_id}")
+def user_post_count(user_id):
+    metric = get_user_post_count(user_id)
+    if metric:
+        return metric
+    else:
+        raise HTTPException(status_code=404, detail="Metric Created Unsuccessfully")
+
+@app.get("/get_user_follower_count/{user_id}")
+def user_follower_count(user_id):
+    metric = get_user_follower_count(user_id)
+    if metric:
+        return metric
+    else:
+        return 0
+
+@app.get("/get_following_count/{user_id}")
+def following_count(user_id):
+    metric = get_following_count(user_id)
+    if metric:
+        return metric
+    else:
+        return 0
+
+@app.get("/get_for_sale_posts/{user_id}")
+def for_sale_posts(user_id):
+    metric = get_for_sale_posts(user_id)
+    if metric:
+        return metric
+    else:
+        return 0
+
+@app.get("/get_favorite_shoe_brand/{user_id}")
+def favorite_shoe_brand(user_id):
+    metric = get_favorite_shoe_brand(user_id)
+    if metric:
+        return metric
+    else:
+        raise HTTPException(status_code=404, detail="Metric Created Unsuccessfully")
 
 if __name__ == "__main__":
     uvicorn.run("app:app", host="127.0.0.1", port=8000, reload=False)

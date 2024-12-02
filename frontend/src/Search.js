@@ -19,7 +19,6 @@ import SendIcon from "@mui/icons-material/Send";
 import axios from "axios";
 import ScrollingList from "./ScrollingList";
 import { NavLink } from "react-router-dom";
-
 import { AuthContext } from "./AuthContext";
 
 const Search = () => {

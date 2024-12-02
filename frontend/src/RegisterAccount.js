@@ -1,7 +1,7 @@
-import './RegisterAccount.css';
 import axios from "axios";
 import {useState, useContext} from "react";
 import {AuthContext} from "./AuthContext";
+import { TextField, Button, Typography, Box } from '@mui/material';
 
 export default function RegisterAccount(props) {
     const [userUsername, setUserUsername] = useState("");
@@ -13,14 +13,10 @@ export default function RegisterAccount(props) {
     const [successMessage, setSuccessMessage] = useState(null);
     const {handleSignIn} = useContext(AuthContext);
 
-
-
     const handleRegisterUser = async () => {
-        // console.log(typeof props.handleRegisterSuccess)
         try {
             setRegisterErrorMessage(false);
-            // console.log(userUsername, userPassword, userDOB, userHometown)
-            // console.log(typeof userUsername, typeof userPassword, typeof userDOB, typeof userHometown)
+
             const registerResponse = await axios.put('http://localhost:8000/add_users', {
                 "name": userUsername,
                 "password": userPassword,
@@ -28,7 +24,6 @@ export default function RegisterAccount(props) {
                 "hometown": userHometown
             });
 
-            // console.log(registerResponse);
             if (registerResponse.status === 200) {
                 setRegisterErrorMessage(null);
                 setSuccessMessage("User successfully registered");
@@ -36,7 +31,6 @@ export default function RegisterAccount(props) {
                 setUserPassword("");
                 setUserDOB("");
                 setUserHometown("");
-                // OnRegisterSuccess(registerResponse.data); /##NEED TO PASS USER OBJECT ON REGISTER
                 handleSignIn(userUsername, registerResponse.data.user_id);
             }
         } catch (error) {
@@ -48,85 +42,135 @@ export default function RegisterAccount(props) {
     const handleSubmit = () =>{
         if (userUsername === "" || userPassword === "" || userDOB === "" || userHometown === "") {
             setRegisterErrorMessage("Please fill out all fields");
+            
             setHighlightRed({
                 username: userUsername === "" ? true : highlightRed.username,
                 password: userPassword === "" ? true : highlightRed.password,
                 dob: userDOB === "" ? true : highlightRed.dob,
                 hometown: userHometown === "" ? true : highlightRed.hometown
             });
+            
             return;
         }
         else{
             handleRegisterUser();
-            
         }
     }
 
     return (
-        <div className="App">
-            <div className="App-header">
-                        <h2>Register New User Account</h2>
-                        <input
-                            type="text"
-                            placeholder="Username"
-                            value={userUsername}
-                            onChange={(e) => setUserUsername(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    handleSubmit();
-                                }
-                            }}
-                            style={{margin: '10px', padding: '10px', borderColor: highlightRed.username? 'red' : 'black'}}
-                            required
-                        />
-                        <br/>
-                        <input
-                            type="password"
-                            placeholder="Password"
-                            value={userPassword}
-                            onChange={(e) => setUserPassword(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    handleSubmit();
-                                }
-                            }}
-                            style={{margin: '10px', padding: '10px',  borderColor: highlightRed.password? 'red' : 'black'}}
-                            required
-                        />
-                         <br/>
-                        <input
-                            type="date"
-                            value={userDOB}
-                            onChange={(e) => setUserDOB(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    handleSubmit();
-                                }
-                            }}
-                            style={{margin: '10px', padding: '10px',  borderColor: highlightRed.dob? 'red' : 'black'}}
-                            required
-                        />
-                         <br/>
-                        <input
-                            type="text"
-                            placeholder="Hometown"
-                            value={userHometown}
-                            onChange={(e) => setUserHometown(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    handleSubmit();
-                                }
-                            }}
-                            style={{margin: '10px', padding: '10px', borderColor: highlightRed.hometown? 'red' : 'black'}}
-                            required
-                        />
-                        <br/>
-                        <button onClick={handleSubmit} style={{padding: '10px 20px'}}>
-                            Register
-                        </button>
-                        {registerErrorMessage && <p style={{color: 'red'}}>{registerErrorMessage}</p>}
-                        {successMessage && <p style={{color: 'green'}}>{successMessage}</p>}
-            </div>
-        </div>
-    )
+        <Box display="flex" alignItems="center" flexDirection="column" justifyContent="center" minHeight="100vh">
+            <Typography variant="h4" fontWeight="bold">
+                Register New User Account
+            </Typography>
+            <Box width="50%" display="flex" flexDirection="column" alignItems="center">
+                <TextField 
+                    label="Username"
+                    variant="outlined"
+                    value={userUsername}
+                    onChange={(e) => setUserUsername(e.target.value)}
+                    onKeyDown={(e) => {
+                         if (e.key === 'Enter') {
+                            handleSubmit();
+                        }
+                    }}
+                    required
+                    fullWidth
+                    margin="normal"
+
+                    sx={{
+                        margin: 1,
+                        '& .MuiOutlinedInput-root': {
+                            '& fieldset': {
+                                borderColor: highlightRed.username ? 'red' : 'black',
+                            },
+                        },
+                    }}
+                />
+
+                <TextField
+                    label="Password"
+                    type="password"
+                    variant="outlined"
+                    value={userPassword}
+                    onChange={(e) => setUserPassword(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            handleSubmit();
+                        }
+                    }}
+                    required
+                    fullWidth
+                    margin="normal"
+
+                    sx={{
+                        margin: 1,
+                        '& .MuiOutlinedInput-root': {
+                            '& fieldset': {
+                                borderColor: highlightRed.password ? 'red' : 'black',
+                            },
+                        },
+                    }}
+                /> 
+
+                <TextField
+                    label = "Date of Birth"
+                    variant="outlined"
+                    type="date"
+                    value={userDOB}
+                    onChange={(e) => setUserDOB(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            handleSubmit();
+                        }
+                    }}
+                    InputLabelProps={{
+						shrink: true,
+					}}
+                    required
+                    fullWidth
+                    margin="normal"
+
+                    sx={{
+                        margin: 1,
+                        '& .MuiOutlinedInput-root': {
+                            '& fieldset': {
+                                borderColor: highlightRed.dob ? 'red' : 'black',
+                            },
+                        },
+                    }}
+                />
+
+                <TextField
+                    label="Hometown"
+                    variant="outlined"
+                    value={userHometown}
+                    onChange={(e) => setUserHometown(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            handleSubmit();
+                        }
+                    }}
+                    required
+                    fullWidth
+                    margin="normal"
+
+                    sx={{
+                        margin: 1,
+                        '& .MuiOutlinedInput-root': {
+                            '& fieldset': {
+                                borderColor: highlightRed.hometown ? 'red' : 'black',
+                            },
+                        },
+                    }}
+                />            
+
+                <Button variant="contained" color="primary" onClick={handleSubmit} style={{ marginTop: '20px' }}>
+                    Register
+                </Button>
+
+                {registerErrorMessage && <p style={{color: 'red'}}>{registerErrorMessage}</p>}
+                {successMessage && <p style={{color: 'green'}}>{successMessage}</p>}
+            </Box>
+        </Box>
+    );
 }
